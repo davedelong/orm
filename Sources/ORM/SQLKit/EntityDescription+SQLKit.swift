@@ -8,58 +8,9 @@
 import Foundation
 import SQLKit
 
-extension EntityDescription {
+extension AnyEntityDescription {
     
-    private func isUnique(_ keyPath: AnyKeyPath) -> Bool {
-        return constraints.contains(where: { c -> Bool in
-            if case .unique(let kps) = c, kps == [keyPath] { return true }
-            return false
-        })
-    }
-    
-    public func builders(for database: any SQLDatabase) throws -> Array<SQLQueryBuilder> {
-        var builders = Array<SQLQueryBuilder>()
-        
-        let tableBuilder = database.create(table: self.name)
-        builders.append(tableBuilder)
-        
-        for attribute in self.attributes {
-            builders.append(contentsOf: buildAttribute(attribute, into: tableBuilder, database: database))
-        }
-        
-        for constraint in self.constraints {
-            switch constraint {
-                case .indexed(property: let kp):
-                    let name = self.name(for: kp)!
-                    builders.append(database.create(index: "idx-\(self.name)_\(name)"))
-                case .unique(properties: let kps):
-                    if kps.count > 1 { // 1-count unique constraints are handled at the column leve
-                        let names = kps.map { self.name(for: $0)! }
-                        tableBuilder.unique(names)
-                    }
-                case .foreignKey(source: let source, target: let targetEntityType, onUpdate: let update, onDelete: let delete):
-                    let targetEntityName = try targetEntityType.erasedDefaultEntityDescription.name
-                    tableBuilder.foreignKey([self.name(for: source)!],
-                                            references: targetEntityName, ["id"],
-                                            onDelete: delete?.foreignKeyAction,
-                                            onUpdate: update?.foreignKeyAction)
-                    break
-            }
-        }
-        
-        return builders
-//        .create(table: "planets")
-//            .column("id", type: .bigint, .primaryKey)
-//            .column("name", type: .text, .default("unnamed"))
-//            .column("galaxy_id", type: .bigint, .references("galaxies", "id"))
-//            .column("diameter", type: .int, .check(SQLRaw("diameter > 0")))
-//            .column("important", type: .text, .notNull)
-//            .column("special", type: .text, .unique)
-//            .column("automatic", type: .text, .generated(SQLRaw("CONCAT(name, special)")))
-//            .column("collated", type: .text, .collate(name: "default"))
-    }
-    
-    private func buildAttribute(_ attr: EntityAttribute, namePrefix: String = "", into builder: SQLCreateTableBuilder, database: any SQLDatabase) -> Array<SQLCreateTableBuilder> {
+    fileprivate func buildAttribute(_ attr: EntityAttribute, namePrefix: String = "", into builder: SQLCreateTableBuilder, database: any SQLDatabase) -> Array<SQLCreateTableBuilder> {
         if attr.isMultiValue == false {
             if let dataType = attr.valueType.sqlDataType {
                 var constraints = Array<SQLColumnConstraintAlgorithm>()
@@ -71,7 +22,7 @@ extension EntityDescription {
                     } else {
                         constraints.append(.primaryKey(autoIncrement: false))
                     }
-                } else if isUnique(attr.keyPath) {
+                } else if attr.unique {
                     constraints.append(.unique)
                 }
                 
@@ -98,6 +49,60 @@ extension EntityDescription {
             // need an intermediate table
             return []
         }
+    }
+}
+
+extension EntityDescription {
+    
+    public func builders(for database: any SQLDatabase) throws -> Array<SQLQueryBuilder> {
+        var builders = Array<SQLQueryBuilder>()
+        
+        let tableBuilder = database.create(table: self.name)
+        builders.append(tableBuilder)
+        
+        for attribute in self.attributes {
+            builders.append(contentsOf: buildAttribute(attribute, into: tableBuilder, database: database))
+        }
+        
+        for constraint in self.constraints {
+            switch constraint {
+                case .indexed(property: let kp):
+                    let name = self.name(for: kp)!
+                    let idx = database.create(index: "idx-\(self.name)_\(name)")
+                                      .on(self.name)
+                                      .column(name)
+                    builders.append(idx)
+                case .unique(properties: let kps):
+                    let names = kps.map { self.name(for: $0)! }
+                    tableBuilder.unique(names)
+                case .foreignKey(source: let source, target: let targetEntityType, onUpdate: let update, onDelete: let delete):
+                    let targetEntityName = try targetEntityType.erasedDefaultEntityDescription.name
+                    tableBuilder.foreignKey([self.name(for: source)!],
+                                            references: targetEntityName, ["id"],
+                                            onDelete: delete?.foreignKeyAction,
+                                            onUpdate: update?.foreignKeyAction)
+                    break
+            }
+        }
+        
+        return builders
+//        .create(table: "planets")
+//            .column("id", type: .bigint, .primaryKey)
+//            .column("name", type: .text, .default("unnamed"))
+//            .column("galaxy_id", type: .bigint, .references("galaxies", "id"))
+//            .column("diameter", type: .int, .check(SQLRaw("diameter > 0")))
+//            .column("important", type: .text, .notNull)
+//            .column("special", type: .text, .unique)
+//            .column("automatic", type: .text, .generated(SQLRaw("CONCAT(name, special)")))
+//            .column("collated", type: .text, .collate(name: "default"))
+    }
+    
+}
+
+extension CompositeEntityDescription {
+    
+    public func builders(for database: any SQLKit.SQLDatabase) throws -> Array<any SQLKit.SQLQueryBuilder> {
+        return []
     }
     
 }

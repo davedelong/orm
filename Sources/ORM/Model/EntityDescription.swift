@@ -10,9 +10,21 @@ import SQLKit
 
 public protocol AnyEntityDescription: CustomStringConvertible {
     var name: String { get }
-    var referencedEntities: Array<any Entity.Type> { get }
-    func name(for keyPath: AnyKeyPath) -> String?
+    var attributes: Array<EntityAttribute> { get }
     func builders(for database: any SQLDatabase) throws -> Array<SQLQueryBuilder>
+}
+
+extension AnyEntityDescription {
+    internal var referencedEntities: Array<any Entity.Type> {
+        return attributes.flatMap(\.referencedEntities)
+    }
+    internal func attribute(for keyPath: AnyKeyPath) -> EntityAttribute? {
+        let match = attributes.first(where: { $0.matches(keyPath) })
+        return match
+    }
+    internal func name(for keyPath: AnyKeyPath) -> String? {
+        attribute(for: keyPath)?.name
+    }
 }
 
 public struct EntityDescription<E: Entity>: AnyEntityDescription {
@@ -22,10 +34,6 @@ public struct EntityDescription<E: Entity>: AnyEntityDescription {
     internal var constraints: Array<EntityConstraint>
     
     internal var compositeEntities: Array<AnyEntityDescription>
-    
-    public var referencedEntities: Array<any Entity.Type> {
-        return attributes.flatMap(\.referencedEntities)
-    }
     
     internal init(entity: E.Type = E.self) throws {
         self.name = entity.name
@@ -38,10 +46,10 @@ public struct EntityDescription<E: Entity>: AnyEntityDescription {
             attributes.append(attr)
         }
         
-        guard attributes.contains(where: { $0.name == "id" }) else {
+        guard let idAttr = attributes.first(where: { $0.name == "id" }) else {
             throw EntityError.missingID(E.self)
         }
-        self.idKeyPath = E.idKeyPath
+        self.idKeyPath = idAttr.keyPath as! KeyPath<E, E.ID>
     }
     
     public func name(for keyPath: AnyKeyPath) -> String? {
@@ -99,7 +107,18 @@ public struct EntityDescription<E: Entity>: AnyEntityDescription {
                 throw EntityError.invalidAttribute("Cannot locate stored property", keyPath)
             }
         }
-        return try constraint(.unique(properties: keyPaths))
+        if keyPaths.count == 1 {
+            let keyPath = keyPaths[0]
+            var copy = self
+            guard let idx = copy.attributes.firstIndex(where: { $0.matches(keyPath) }) else {
+                throw EntityError.invalidAttribute("Cannot locate attribute for keyPath", keyPath)
+            }
+            
+            copy.attributes[idx].unique = true
+            return copy
+        } else {
+            return try constraint(.unique(properties: keyPaths))
+        }
     }
     
     public func indexed<V>(_ keyPath: KeyPath<E, V>) throws -> Self {

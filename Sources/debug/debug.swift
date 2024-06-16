@@ -17,6 +17,7 @@ struct Account: Entity {
                 .unique(\.email)
                 .defaultValue(\.settings, .init(hasPro: false, permissionLevel: 42))
                 .reference(\.computers, onDelete: .cascade)
+                .indexed(\.email)
         }
     }
     

@@ -26,7 +26,16 @@ extension PersistentValue {
 // with a unique index on (owner id, order value)
 extension Array: PersistentValue where Element: PersistentValue {
     public static var missingValue: Self { [] }
-    public static var semantics: _PersistentValueSemantics { .init(persistentType: .collection, isMultiValue: true) }
+    public static var semantics: _PersistentValueSemantics {
+        get throws {
+            let comp = CompositeEntityDescription(attributes: [
+                try .init(name: "owner", type: UUID.self),
+                try .init(name: "order", type: Int.self),
+                try .init(name: "value", type: Element.self)
+            ], unique: ["owner", "order"])
+            return .init(persistentType: .collection(comp), isMultiValue: true)
+        }
+    }
     public static func coerce(_ value: Any) -> Self? {
         if let arr = value as? Self { return arr }
         if let anyArr = value as? Array<Any> {
@@ -48,7 +57,15 @@ extension Array: PersistentValue where Element: PersistentValue {
 // with a unique index on (owner id, value-or-foreign-key)
 extension Set: PersistentValue where Element: PersistentValue {
     public static var missingValue: Self { [] }
-    public static var semantics: _PersistentValueSemantics { .init(persistentType: .collection, isMultiValue: true) }
+    public static var semantics: _PersistentValueSemantics {
+        get throws {
+            let comp = CompositeEntityDescription(attributes: [
+                try .init(name: "owner", type: UUID.self),
+                try .init(name: "value", type: Element.self)
+            ], unique: ["owner", "value"])
+            return .init(persistentType: .collection(comp), isMultiValue: true)
+        }
+    }
     public static func coerce(_ value: Any) -> Self? {
         if let arr = value as? Self { return arr }
         if let anyArr = value as? Set<AnyHashable> {
@@ -89,7 +106,16 @@ extension Set: PersistentValue where Element: PersistentValue {
 // with a unique index on (owner id, key name)
 extension Dictionary: PersistentValue where Key: PersistentValue, Value: PersistentValue {
     public static var missingValue: Self { [:] }
-    public static var semantics: _PersistentValueSemantics { .init(persistentType: .collection, isMultiValue: true) }
+    public static var semantics: _PersistentValueSemantics {
+        get throws {
+            let comp = CompositeEntityDescription(attributes: [
+                try .init(name: "owner", type: UUID.self),
+                try .init(name: "key", type: Key.self),
+                try .init(name: "value", type: Value.self)
+            ], unique: ["owner", "key"])
+            return .init(persistentType: .collection(comp), isMultiValue: true)
+        }
+    }
     public static func coerce(_ value: Any) -> Self? {
         if let arr = value as? Self { return arr }
         if let anyDict = value as? Dictionary<AnyHashable, Any> {
@@ -104,4 +130,13 @@ extension Dictionary: PersistentValue where Key: PersistentValue, Value: Persist
         }
         return nil
     }
+}
+
+public struct CompositeEntityDescription: AnyEntityDescription {
+    public var name: String { "" }
+    
+    public let attributes: Array<EntityAttribute>
+    internal let unique: Array<String>
+    
+    public var description: String { "" }
 }

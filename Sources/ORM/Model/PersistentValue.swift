@@ -84,7 +84,7 @@ public enum PersistentType {
     case timestamp
     case codable
     case composite(Array<EntityAttribute>)
-    case collection
+    case collection(CompositeEntityDescription)
     
     case _entity
 }
