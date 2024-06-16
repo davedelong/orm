@@ -20,7 +20,7 @@ public struct Snapshot<E: Entity> {
     // TODO: if the DML is to another entity, box it in a Snapshot first
     
     public subscript<Value: PersistentValue>(dynamicMember keyPath: KeyPath<E, Value>) -> Value {
-        guard let attr = entity.attributes.first(where: { $0.keyPath == keyPath }) else {
+        guard let attr = entity.attributes.first(where: { $0.matches(keyPath) }) else {
             fatalError("Unknown \(E.self) keyPath: \(keyPath)")
         }
         if let anyValue = values[attr.name], let value = Value.coerce(anyValue) {

@@ -6,8 +6,11 @@
 //
 
 import Foundation
+import SQLKit
+import Logging
+import NIOCore
 
-public struct Schema {
+public struct Schema: CustomStringConvertible {
     
     internal let entities: Array<AnyEntityDescription>
     
@@ -23,7 +26,7 @@ public struct Schema {
             guard seen.contains(nextID) == false else { continue }
             seen.insert(nextID)
             
-            let description = next.erasedEntityDescription
+            let description = try next.erasedEntityDescription
             descriptions.append(description)
             entitiesToProcess.append(contentsOf: description.referencedEntities)
         }
@@ -31,6 +34,64 @@ public struct Schema {
         self.entities = descriptions
     }
     
+    public var description: String {
+        return "[" + entities.map(\.description).joined(separator: "\n") + "]"
+    }
+    
+    public func run() throws {
+        let db = DB()
+        var builders = Array<any SQLQueryBuilder>()
+        for entity in entities {
+            builders.append(contentsOf: try entity.builders(for: db))
+        }
+        
+        for builder in builders {
+            var serializer = SQLSerializer(database: db)
+            builder.query.serialize(to: &serializer)
+            print(serializer.sql)
+        }
+    }
+}
+
+private struct DB: SQLDatabase {
+    
+    struct Dialect: SQLDialect {
+        var name: String { "custom" }
+        
+        var identifierQuote: any SQLKit.SQLExpression { SQLRaw("'") }
+        
+        var supportsAutoIncrement: Bool { true }
+        
+        var autoIncrementClause: any SQLKit.SQLExpression { SQLRaw("AUTOINCREMENT") }
+        
+        func bindPlaceholder(at position: Int) -> any SQLKit.SQLExpression {
+            fatalError()
+        }
+        
+        func literalBoolean(_ value: Bool) -> any SQLKit.SQLExpression {
+            return value ? SQLRaw("true") : SQLRaw("false")
+        }
+    }
+    
+    var logger: Logging.Logger { Logger(label: "custom") }
+    
+    var eventLoop: any NIOCore.EventLoop { FakeEventLoop() }
+    
+    var dialect: any SQLKit.SQLDialect { Dialect() }
+    
+    func execute(sql query: any SQLKit.SQLExpression, _ onRow: @escaping @Sendable (any SQLKit.SQLRow) -> ()) -> NIOCore.EventLoopFuture<Void> {
+        print(query)
+        return eventLoop.makeSucceededVoidFuture()
+    }
+    
+}
+
+final class FakeEventLoop: EventLoop, @unchecked Sendable {
+    func shutdownGracefully(queue: DispatchQueue, _: @escaping @Sendable ((any Error)?) -> Void) {}
+    var inEventLoop: Bool = false
+    func execute(_ work: @escaping @Sendable () -> Void) { self.inEventLoop = true; work(); self.inEventLoop = false }
+    @discardableResult func scheduleTask<T>(deadline: NIODeadline, _: @escaping @Sendable () throws -> T) -> Scheduled<T> { fatalError() }
+    @discardableResult func scheduleTask<T>(in: TimeAmount, _: @escaping @Sendable () throws -> T) -> Scheduled<T> { fatalError() }
 }
 
 /*

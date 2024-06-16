@@ -1,43 +1,44 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Dave DeLong on 6/8/24.
 //
 
 import Foundation
 
-func fields(of type: Any.Type) -> Array<(String, AnyKeyPath, Any.Type)> {
+func fields(of type: Any.Type) -> Array<(String, AnyKeyPath)> {
     _openExistential(type, do: fields(of:))
 }
 
-func fields<T>(of type: T.Type = T.self) -> Array<(String, PartialKeyPath<T>, Any.Type)> {
-    var all = Array<(String, PartialKeyPath<T>, Any.Type)>()
+func fields<T>(of type: T.Type = T.self) -> Array<(String, PartialKeyPath<T>)> {
+    var all = Array<(String, PartialKeyPath<T>)>()
     enumerateFields(of: type, using: {
-        all.append(($0, $1, $2))
+        all.append(($0, $1))
     })
     return all
 }
 
-func enumerateFields<T>(of type: T.Type = T.self, using block: (String, PartialKeyPath<T>, Any.Type) -> Void) {
-    var options = EachFieldOptions()
+func enumerateFields<T>(of type: T.Type = T.self, using block: (String, PartialKeyPath<T>) -> Void) {
+    var options: EachFieldOptions = [.ignoreUnknown]
     _ = forEachFieldWithKeyPath(of: type, options: &options, body: { label, keyPath in
         let string = String(cString: label)
-        block(string, keyPath, keyPath.valueType)
+        block(string, keyPath)
         return true
     })
 }
 
-extension PartialKeyPath {
-    var valueType: Any.Type { Self.valueType }
+extension AnyKeyPath {
+    internal var erasedRootType: any Any.Type { type(of: self).rootType }
+    internal var erasedValueType: any Any.Type { type(of: self).valueType }
 }
 
 internal struct EachFieldOptions: OptionSet {
     static let classType = Self(rawValue: 1 << 0)
     static let ignoreUnknown = Self(rawValue: 1 << 1)
-
+    
     let rawValue: UInt32
-
+    
     init(rawValue: UInt32) {
         self.rawValue = rawValue
     }
