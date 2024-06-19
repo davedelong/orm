@@ -21,6 +21,14 @@ struct Account: Entity {
         }
     }
     
+    static func build() throws -> EntityBuilder<Account> {
+        try EntityBuilder() {
+            try StoredProperty(keyPath: \.id)
+            try StoredProperty(keyPath: \.email)
+            try StoredProperty(keyPath: \.settings)
+        }
+    }
+    
     var id: EntityID<Self, Int>
     var parentID: ID?
     var email: String
@@ -65,6 +73,9 @@ struct Computer: Entity {
 @main
 struct Debug {
     static func main() async throws {
+        let b = try EntityBuilder(Account.self)
+        print(b)
+        
         let schema = try Schema(entities: Account.self)
 //        print(schema)
         

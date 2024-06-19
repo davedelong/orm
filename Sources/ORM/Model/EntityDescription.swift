@@ -41,7 +41,7 @@ public struct EntityDescription<E: Entity>: AnyEntityDescription {
         self.constraints = []
         self.compositeEntities = []
         
-        for (name, keyPath) in E.storedProperties {
+        for (name, keyPath) in E.properties {
             let attr = try EntityAttribute(name: name, keyPath: keyPath)
             attributes.append(attr)
         }

@@ -8,6 +8,8 @@
 import Foundation
 
 public enum EntityError: Error {
+    case noStoredProperties(Any.Type)
+    
     case invalidPropertyType(String, Any.Type, Any.Type)
     case invalidAttribute(String, AnyKeyPath)
     

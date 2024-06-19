@@ -26,6 +26,9 @@ public struct Schema: CustomStringConvertible {
             guard seen.contains(nextID) == false else { continue }
             seen.insert(nextID)
             
+            let builder = try next.buildDescription()
+            print(builder)
+            
             let description = try next.erasedEntityDescription
             descriptions.append(description)
             entitiesToProcess.append(contentsOf: description.referencedEntities)

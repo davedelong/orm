@@ -11,6 +11,8 @@ public protocol Entity: Identifiable where ID == EntityID<Self, RawID> {
     associatedtype RawID: EntityIDType
     
     static var entityDescription: EntityDescription<Self> { get throws }
+    
+    static func build() throws -> EntityBuilder<Self>
 }
 
 extension Entity {
@@ -28,13 +30,49 @@ extension Entity {
         get throws { return try .init() }
     }
     
-    internal static var idKeyPath: KeyPath<Self, Self.ID> { \.id }
-    internal static var storedProperties: Array<(String, PartialKeyPath<Self>)> { ORM.fields(of: Self.self) }
+    public static func build() throws -> EntityBuilder<Self> { try .init() }
+    internal static func buildDescription() throws -> _EntityDescription { try build()._desc }
 }
 
 extension Entity {
+    internal static var idKeyPath: KeyPath<Self, Self.ID> { \.id }
+    
     internal static var idSemantics: _PersistentValueSemantics {
         get throws { try Self.RawID.semantics }
     }
     internal static var name: String { "\(Self.self)" }
 }
+
+extension Entity {
+    
+    internal static var properties: Array<(String, AnyKeyPath)> {
+        return lookupLock.withLock { withLock_properties }
+    }
+    
+    internal static var propertyLookup: Bimap<String, AnyKeyPath> {
+        return lookupLock.withLock { withLock_lookup }
+    }
+    
+    private static var id: ObjectIdentifier { ObjectIdentifier(Self.self) }
+    
+    private static var withLock_properties: Array<(String, AnyKeyPath)> {
+        if let e = lookupSequenceCache[id] { return e }
+        let fields = ORM.fields(of: Self.self)
+        lookupSequenceCache[id] = fields
+        return fields
+    }
+    
+    private static var withLock_lookup: Bimap<String, AnyKeyPath> {
+        if let e = lookupBimapCache[id] { return e }
+        
+        let props = withLock_properties
+        let map = Bimap(props)
+        lookupBimapCache[id] = map
+        return map
+    }
+    
+}
+
+private let lookupLock = NSLock()
+private var lookupSequenceCache = Dictionary<ObjectIdentifier, Array<(String, AnyKeyPath)>>()
+private var lookupBimapCache = Dictionary<ObjectIdentifier, Bimap<String, AnyKeyPath>>()
