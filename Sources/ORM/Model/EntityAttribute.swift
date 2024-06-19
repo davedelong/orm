@@ -22,7 +22,7 @@ public struct EntityAttribute {
     public var valueType: PersistentType { semantics.persistentType }
     public var isMultiValue: Bool { semantics.isMultiValue }
     
-    internal init(name: String, keyPath: AnyKeyPath) throws {
+    internal init?(name: String, keyPath: AnyKeyPath) {
         let selfType = keyPath.erasedRootType
         let type = keyPath.erasedValueType
         
@@ -34,15 +34,15 @@ public struct EntityAttribute {
             throw EntityError.invalidPropertyType(name, selfType, type)
         }
         
-        try self.init(name: name, keyPath: keyPath, selfType: selfType, type: persistentType)
+        self.init(name: name, keyPath: keyPath, selfType: selfType, type: persistentType)
     }
     
-    init(name: String, keyPath: AnyKeyPath? = nil, selfType: Any.Type? = nil, type: any PersistentValue.Type) throws {
+    init(name: String, keyPath: AnyKeyPath? = nil, selfType: Any.Type? = nil, type: any PersistentValue.Type) {
         self.name = name
         self.defaultValue = nil
         self.keyPath = keyPath
         self.attributeType = type
-        self.semantics = try type.semantics
+        self.semantics = type.semantics
         
         var referenced = Array<any Storable.Type>()
             

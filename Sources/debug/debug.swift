@@ -11,21 +11,11 @@ import ORM
 struct Account: Storable {
     typealias RawID = Int
     
-    static var entityDescription: EntityDescription<Account> {
-        get throws {
-            try defaultEntityDescription
-                .unique(\.email)
-                .defaultValue(\.settings, .init(hasPro: false, permissionLevel: 42))
-                .reference(\.computers, onDelete: .cascade)
-                .indexed(\.email)
-        }
-    }
-    
-    static func build() throws -> EntityBuilder<Account> {
-        try EntityBuilder() {
-            try StoredProperty(keyPath: \.id)
-            try StoredProperty(keyPath: \.email)
-            try StoredProperty(keyPath: \.settings)
+    static var storageRepresentation: some StorageRepresentation {
+        StoredRepresentation(Self.self) {
+            StoredProperty(keyPath: \.id)
+            StoredProperty(keyPath: \.email)
+            StoredProperty(keyPath: \.settings)
         }
     }
     
@@ -73,7 +63,7 @@ struct Computer: Storable {
 @main
 struct Debug {
     static func main() async throws {
-        let b = try EntityBuilder(Account.self)
+        let b = StoredRepresentation(Account.self)
         print(b)
         
         let schema = try Schema(entities: Account.self)

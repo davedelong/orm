@@ -91,9 +91,7 @@ extension Float16: PersistentValue {
 extension Optional: PersistentValue where Wrapped: PersistentValue {
     public static var missingValue: Self { .none }
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let base = try Wrapped.semantics
-            return .init(persistentType: base.persistentType, canBeNull: true, isMultiValue: base.isMultiValue)
-        }
+        let base = Wrapped.semantics
+        return .init(persistentType: base.persistentType, canBeNull: true, isMultiValue: base.isMultiValue)
     }
 }

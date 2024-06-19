@@ -8,9 +8,7 @@
 import Foundation
 
 public struct StoredID<E: Storable, V: EntityIDType>: Hashable, PersistentValue, ForeignKeyValue {
-    public static var semantics: _PersistentValueSemantics {
-        get throws { try V.semantics }
-    }
+    public static var semantics: _PersistentValueSemantics { V.semantics }
     public static func coerce(_ value: Any) -> StoredID<E, V>? {
         if let id = value as? Self { return id }
         if let raw = V.coerce(value) { return .init(rawValue: raw) }

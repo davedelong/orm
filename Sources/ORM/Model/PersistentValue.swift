@@ -9,7 +9,7 @@ import Foundation
 
 public protocol PersistentValue {
     static var missingValue: Self { get throws }
-    static var semantics: _PersistentValueSemantics { get throws }
+    static var semantics: _PersistentValueSemantics { get }
     static func coerce(_ value: Any) -> Self?
 }
 
@@ -26,10 +26,8 @@ extension RawRepresentable where Self: PersistentValue & CaseIterable, RawValue:
         get throws { .init(rawValue: try RawValue.missingValue)! }
     }
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let base = try RawValue.semantics
-            return .init(persistentType: base.persistentType, isMultiValue: base.isMultiValue)
-        }
+        let base = RawValue.semantics
+        return .init(persistentType: base.persistentType, isMultiValue: base.isMultiValue)
     }
     public static func coerce(_ value: Any) -> Self? {
         if let rr = value as? Self { return rr }
@@ -43,10 +41,8 @@ extension RawRepresentable where Self: PersistentValue, RawValue: PersistentValu
         get throws { .init(rawValue: try RawValue.missingValue)! }
     }
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let base = try RawValue.semantics
-            return .init(persistentType: base.persistentType, canBeNull: true, isMultiValue: base.isMultiValue)
-        }
+        let base = RawValue.semantics
+        return .init(persistentType: base.persistentType, canBeNull: true, isMultiValue: base.isMultiValue)
     }
     public static func coerce(_ value: Any) -> Self? {
         if let rr = value as? Self { return rr }

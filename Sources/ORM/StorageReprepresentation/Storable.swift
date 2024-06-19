@@ -14,30 +14,19 @@ public protocol Storable: Identifiable where ID == StoredID<Self, RawID> {
     static var storageRepresentation: Representation { get }
 }
 
-extension Storable {
-    internal static var erasedEntityDescription: AnyEntityDescription {
-        get throws { try entityDescription }
-    }
-    internal static var erasedDefaultEntityDescription: AnyEntityDescription {
-        get throws { try defaultEntityDescription }
+extension Storable where Representation == StoredRepresentation<Self> {
+    
+    public static var storageRepresentation: Representation {
+        return StoredRepresentation(Self.self)
     }
     
-    public static var entityDescription: EntityDescription<Self> {
-        get throws { try defaultEntityDescription }
-    }
-    public static var defaultEntityDescription: EntityDescription<Self> {
-        get throws { return try .init() }
-    }
-    
-    public static func build() throws -> EntityBuilder<Self> { try .init() }
-    internal static func buildDescription() throws -> _EntityDescription { try build()._desc }
 }
 
 extension Storable {
     internal static var idKeyPath: KeyPath<Self, Self.ID> { \.id }
     
     internal static var idSemantics: _PersistentValueSemantics {
-        get throws { try Self.RawID.semantics }
+        Self.RawID.semantics
     }
     internal static var name: String { "\(Self.self)" }
 }

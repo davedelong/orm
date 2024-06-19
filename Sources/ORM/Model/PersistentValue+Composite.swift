@@ -10,11 +10,9 @@ import Foundation
 extension PersistentValue {
     
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let fields = ORM.fields(of: Self.self)
-            let attrs = try fields.map { try EntityAttribute(name: $0, keyPath: $1) }
-            return .init(persistentType: .composite(attrs))
-        }
+        let fields = ORM.fields(of: Self.self)
+        let attrs = fields.map { EntityAttribute(name: $0, keyPath: $1) }
+        return .init(persistentType: .composite(attrs))
     }
     
 }
@@ -27,14 +25,12 @@ extension PersistentValue {
 extension Array: PersistentValue where Element: PersistentValue {
     public static var missingValue: Self { [] }
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let comp = CompositeEntityDescription(attributes: [
-                try .init(name: "owner", type: UUID.self),
-                try .init(name: "order", type: Int.self),
-                try .init(name: "value", type: Element.self)
-            ], unique: ["owner", "order"])
-            return .init(persistentType: .collection(comp), isMultiValue: true)
-        }
+        let comp = CompositeEntityDescription(attributes: [
+            try .init(name: "owner", type: UUID.self),
+            try .init(name: "order", type: Int.self),
+            try .init(name: "value", type: Element.self)
+        ], unique: ["owner", "order"])
+        return .init(persistentType: .collection(comp), isMultiValue: true)
     }
     public static func coerce(_ value: Any) -> Self? {
         if let arr = value as? Self { return arr }
@@ -58,13 +54,11 @@ extension Array: PersistentValue where Element: PersistentValue {
 extension Set: PersistentValue where Element: PersistentValue {
     public static var missingValue: Self { [] }
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let comp = CompositeEntityDescription(attributes: [
-                try .init(name: "owner", type: UUID.self),
-                try .init(name: "value", type: Element.self)
-            ], unique: ["owner", "value"])
-            return .init(persistentType: .collection(comp), isMultiValue: true)
-        }
+        let comp = CompositeEntityDescription(attributes: [
+            try .init(name: "owner", type: UUID.self),
+            try .init(name: "value", type: Element.self)
+        ], unique: ["owner", "value"])
+        return .init(persistentType: .collection(comp), isMultiValue: true)
     }
     public static func coerce(_ value: Any) -> Self? {
         if let arr = value as? Self { return arr }
@@ -107,14 +101,12 @@ extension Set: PersistentValue where Element: PersistentValue {
 extension Dictionary: PersistentValue where Key: PersistentValue, Value: PersistentValue {
     public static var missingValue: Self { [:] }
     public static var semantics: _PersistentValueSemantics {
-        get throws {
-            let comp = CompositeEntityDescription(attributes: [
-                try .init(name: "owner", type: UUID.self),
-                try .init(name: "key", type: Key.self),
-                try .init(name: "value", type: Value.self)
-            ], unique: ["owner", "key"])
-            return .init(persistentType: .collection(comp), isMultiValue: true)
-        }
+        let comp = CompositeEntityDescription(attributes: [
+            try .init(name: "owner", type: UUID.self),
+            try .init(name: "key", type: Key.self),
+            try .init(name: "value", type: Value.self)
+        ], unique: ["owner", "key"])
+        return .init(persistentType: .collection(comp), isMultiValue: true)
     }
     public static func coerce(_ value: Any) -> Self? {
         if let arr = value as? Self { return arr }
