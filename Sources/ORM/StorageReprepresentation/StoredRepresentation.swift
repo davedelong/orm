@@ -22,7 +22,7 @@ public struct StoredRepresentation<S: Storable>: StorageRepresentation {
                 if let entityIDType = keyPath.erasedValueType as? any EntityIDType.Type {
                     let storageType = entityIDType.semantics.persistentType
                     let p = _StoredProperty(name: name, keyPath: keyPath,
-                                            storageType: storageType, isUnique: false, isIndexed: false)
+                                            isUnique: false, isIndexed: false)
                     properties.append(p)
                 }
             } else if let entityType = keyPath.erasedValueType as? any StorageRepresentation.Type {
@@ -36,7 +36,7 @@ public struct StoredRepresentation<S: Storable>: StorageRepresentation {
             } else if let valueType = keyPath.erasedValueType as? any PersistentValue.Type {
                 let storageType = valueType.semantics.persistentType
                 let p = _StoredProperty(name: name, keyPath: keyPath,
-                                        storageType: storageType, isUnique: false, isIndexed: false)
+                                        isUnique: false, isIndexed: false)
                 properties.append(p)
                 print("Found stored property: \(name) - \(keyPath)")
             } else {

@@ -29,7 +29,6 @@ internal struct _EntityDescription {
 internal struct _StoredProperty {
     var name: String
     var keyPath: AnyKeyPath
-    var storageType: PersistentType
     var isUnique: Bool
     var isIndexed: Bool
     var defaultValue: Any?

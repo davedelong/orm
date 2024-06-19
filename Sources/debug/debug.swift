@@ -16,6 +16,8 @@ struct Account: Storable {
             StoredProperty(keyPath: \.id)
             StoredProperty(keyPath: \.email)
             StoredProperty(keyPath: \.settings)
+            
+            RelationshipProperty(keyPath: \.computers)
         }
     }
     

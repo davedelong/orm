@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct StoredID<E: Storable, V: EntityIDType>: Hashable, PersistentValue, ForeignKeyValue {
+public struct StoredID<E: Storable, V: EntityIDType>: Hashable, StoredValue, PersistentValue, ForeignKeyValue {
     public static var semantics: _PersistentValueSemantics { V.semantics }
     public static func coerce(_ value: Any) -> StoredID<E, V>? {
         if let id = value as? Self { return id }

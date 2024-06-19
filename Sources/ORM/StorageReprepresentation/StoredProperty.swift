@@ -24,10 +24,8 @@ public struct StoredProperty<S: Storable, V: StoredValue>: Attribute {
     public var defaultValue: V? { _property.defaultValue as? V }
     
     public init(name: String? = nil, keyPath: KeyPath<S, V>) {
-        let type = V.semantics.persistentType
         self._property = _StoredProperty(name: name ?? S.propertyLookup[keyPath]!,
                                          keyPath: keyPath,
-                                         storageType: type,
                                          isUnique: false, 
                                          isIndexed: false)
     }
@@ -46,4 +44,6 @@ public struct StoredProperty<S: Storable, V: StoredValue>: Attribute {
         _property.defaultValue = value
         return self
     }
+    
+    // TODO: type-specific constraints would go here
 }
