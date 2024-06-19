@@ -7,11 +7,19 @@
 
 import Foundation
 
-public protocol Storable: Identifiable where ID == StoredID<Self, RawID> {
+public protocol Storable {
     associatedtype Representation: StorageRepresentation
-    associatedtype RawID: EntityIDType
     
     static var storageRepresentation: Representation { get }
+    static var missingValue: Self? { get }
+}
+
+extension Storable {
+    
+    public static var missingValue: Self? {
+        return nil
+    }
+    
 }
 
 extension Storable where Representation == StoredRepresentation<Self> {
@@ -20,15 +28,6 @@ extension Storable where Representation == StoredRepresentation<Self> {
         return StoredRepresentation(Self.self)
     }
     
-}
-
-extension Storable {
-    internal static var idKeyPath: KeyPath<Self, Self.ID> { \.id }
-    
-    internal static var idSemantics: _PersistentValueSemantics {
-        Self.RawID.semantics
-    }
-    internal static var name: String { "\(Self.self)" }
 }
 
 extension Storable {
@@ -41,7 +40,7 @@ extension Storable {
         return lookupLock.withLock { withLock_lookup }
     }
     
-    private static var id: ObjectIdentifier { ObjectIdentifier(Self.self) }
+    internal static var id: ObjectIdentifier { ObjectIdentifier(Self.self) }
     
     private static var withLock_properties: Array<(String, AnyKeyPath)> {
         if let e = lookupSequenceCache[id] { return e }

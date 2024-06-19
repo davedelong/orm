@@ -14,6 +14,11 @@ internal struct Bimap<L: Hashable, R: Hashable>: CustomStringConvertible {
     
     internal var description: String { "Bimap<L, R>(\(leftToRight.count))" }
     
+    internal init() {
+        leftToRight = [:]
+        rightToLeft = [:]
+    }
+    
     internal init(_ elements: any Collection<(L, R)>) {
         leftToRight = Dictionary(uniqueKeysWithValues: elements)
         rightToLeft = Dictionary(uniqueKeysWithValues: elements.map { ($1, $0) })

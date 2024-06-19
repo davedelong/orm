@@ -7,16 +7,8 @@
 
 import Foundation
 
-public protocol Attribute<StoredType> {
-    associatedtype StoredType: Storable
-    
-    var name: String { get }
-}
-
-public struct StoredProperty<S: Storable, V: StoredValue>: Attribute {
-    public typealias StoredType = S
-    
-    internal var _property: _StoredProperty
+public struct Property<S: Storable, V: Storable> {
+    internal var _property: _PropertyDescription
     
     public var name: String { _property.name }
     public var isUnique: Bool { _property.isUnique }
@@ -24,7 +16,7 @@ public struct StoredProperty<S: Storable, V: StoredValue>: Attribute {
     public var defaultValue: V? { _property.defaultValue as? V }
     
     public init(name: String? = nil, keyPath: KeyPath<S, V>) {
-        self._property = _StoredProperty(name: name ?? S.propertyLookup[keyPath]!,
+        self._property = _PropertyDescription(name: name ?? S.propertyLookup[keyPath]!,
                                          keyPath: keyPath,
                                          isUnique: false, 
                                          isIndexed: false)
@@ -47,3 +39,5 @@ public struct StoredProperty<S: Storable, V: StoredValue>: Attribute {
     
     // TODO: type-specific constraints would go here
 }
+
+

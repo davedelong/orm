@@ -23,6 +23,7 @@ extension String {
     init(indent level: Int) { self.init(repeating: "  ", count: level) }
 }
 
+/*
 extension EntityDescription: _HierarchicalStringConvertible {
     
     public func description(at level: Int) -> Array<String> {
@@ -93,3 +94,4 @@ extension EntityConstraint: _HierarchicalStringConvertible {
         }
     }
 }
+*/

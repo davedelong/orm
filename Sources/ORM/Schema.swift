@@ -12,47 +12,71 @@ import NIOCore
 
 public struct Schema: CustomStringConvertible {
     
-    internal let entities: Array<AnyEntityDescription>
+    internal let entities: Array<_StoredObjectDescription>
     
     public init(entities: any Storable.Type...) throws {
-        var descriptions = Array<AnyEntityDescription>()
         
-        var seen = Set<ObjectIdentifier>()
+        var descriptions = Array<_StoredObjectDescription>()
+        var objectsAndNames = Bimap<ObjectIdentifier, String>()
+        
         var entitiesToProcess = entities
         
         while entitiesToProcess.count > 0 {
             let next = entitiesToProcess.removeFirst()
-            let nextID = ObjectIdentifier(next)
-            guard seen.contains(nextID) == false else { continue }
-            seen.insert(nextID)
             
-            let builder = try next.buildDescription()
-            print(builder)
+            let rep = next.storageRepresentation as! _StorageRepresentation
+            let objectID = next.id
             
-            let description = try next.erasedEntityDescription
+            let description = rep.description
+            
+            let name = description.name
+            
+            if let existingName = objectsAndNames[objectID] {
+                guard existingName == name else {
+                    throw StorableError("The Storable type '\(description.entity)' can only have a single name in a schema, not two: \(name) and \(existingName)")
+                }
+                
+                // this id has already been processed
+                continue
+            }
+            
+            if let existingID = objectsAndNames[name] {
+                guard existingID == objectID else {
+                    throw StorableError("The name '\(name)' cannot be used for two different Storable types")
+                }
+                
+                // this name has already been processed. this should be unreachable
+                continue
+            }
+            
+            objectsAndNames[name] = objectID
+            
+            entitiesToProcess.append(contentsOf: description.relatedTypes)
+            
+            // TODO: validate the type
+            
             descriptions.append(description)
-            entitiesToProcess.append(contentsOf: description.referencedEntities)
         }
         
         self.entities = descriptions
     }
     
     public var description: String {
-        return "[" + entities.map(\.description).joined(separator: "\n") + "]"
+        return "[" + entities.map({ "\($0)" }).joined(separator: "\n") + "]"
     }
     
     public func run() throws {
-        let db = DB()
-        var builders = Array<any SQLQueryBuilder>()
-        for entity in entities {
-            builders.append(contentsOf: try entity.builders(for: db))
-        }
-        
-        for builder in builders {
-            var serializer = SQLSerializer(database: db)
-            builder.query.serialize(to: &serializer)
-            print(serializer.sql)
-        }
+//        let db = DB()
+//        var builders = Array<any SQLQueryBuilder>()
+//        for entity in entities {
+//            builders.append(contentsOf: try entity.builders(for: db))
+//        }
+//        
+//        for builder in builders {
+//            var serializer = SQLSerializer(database: db)
+//            builder.query.serialize(to: &serializer)
+//            print(serializer.sql)
+//        }
     }
 }
 

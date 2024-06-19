@@ -8,7 +8,8 @@
 import Foundation
 import SQLKit
 
-extension AnyEntityDescription {
+/*
+extension _StoredObjectDescription {
     
     fileprivate func buildAttribute(_ attr: EntityAttribute, namePrefix: String = "", into builder: SQLCreateTableBuilder, database: any SQLDatabase) -> Array<SQLCreateTableBuilder> {
         if attr.isMultiValue == false {
@@ -52,15 +53,15 @@ extension AnyEntityDescription {
     }
 }
 
-extension EntityDescription {
+extension _StoredObjectDescription {
     
-    public func builders(for database: any SQLDatabase) throws -> Array<SQLQueryBuilder> {
+    internal func builders(for database: any SQLDatabase) throws -> Array<SQLQueryBuilder> {
         var builders = Array<SQLQueryBuilder>()
         
         let tableBuilder = database.create(table: self.name)
         builders.append(tableBuilder)
         
-        for attribute in self.attributes {
+        for attribute in self.storedProperties {
             builders.append(contentsOf: buildAttribute(attribute, into: tableBuilder, database: database))
         }
         
@@ -127,7 +128,7 @@ extension PersistentType {
     
 }
 
-extension ReferenceAction {
+extension RelationshipAction {
     fileprivate var foreignKeyAction: SQLForeignKeyAction? {
         switch self {
             case .cascade: return .cascade
@@ -137,3 +138,4 @@ extension ReferenceAction {
         }
     }
 }
+*/
