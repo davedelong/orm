@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct EntityBuilder<E: Entity> {
+public struct EntityBuilder<E: Storable> {
     internal var name: String { _desc.name }
     
     internal var _desc: _EntityDescription
@@ -26,7 +26,7 @@ public struct EntityBuilder<E: Entity> {
                 let p = _StoredProperty(name: name, keyPath: keyPath,
                                         storageType: storageType, isUnique: false, isIndexed: false)
                 properties.append(p)
-            } else if let entityType = keyPath.erasedValueType as? any Entity.Type {
+            } else if let entityType = keyPath.erasedValueType as? any StorageRepresentation.Type {
                 print("Found reference to directly-stored entity \(entityType): \(name) - \(keyPath)")
             } else if let foreignKeyType = keyPath.erasedValueType as? any ForeignKeyValue.Type {
                 // entity ids, arrays, and sets

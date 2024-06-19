@@ -12,7 +12,7 @@ public struct EntityAttribute {
     
     internal let keyPath: AnyKeyPath?
     internal let attributeType: any PersistentValue.Type
-    internal let referencedEntities: Array<any Entity.Type>
+    internal let referencedEntities: Array<any Storable.Type>
     
     internal var defaultValue: Any?
     internal var unique = false
@@ -26,7 +26,7 @@ public struct EntityAttribute {
         let selfType = keyPath.erasedRootType
         let type = keyPath.erasedValueType
         
-        if type is any Entity.Type {
+        if type is any Storable.Type {
             throw EntityError.invalidPropertyType(name, selfType, type)
         }
         
@@ -44,7 +44,7 @@ public struct EntityAttribute {
         self.attributeType = type
         self.semantics = try type.semantics
         
-        var referenced = Array<any Entity.Type>()
+        var referenced = Array<any Storable.Type>()
             
         if let foreignKey = type as? any ForeignKeyValue.Type, selfType != foreignKey.targetEntity {
             referenced = [foreignKey.targetEntity]

@@ -15,7 +15,7 @@ public protocol AnyEntityDescription: CustomStringConvertible {
 }
 
 extension AnyEntityDescription {
-    internal var referencedEntities: Array<any Entity.Type> {
+    internal var referencedEntities: Array<any Storable.Type> {
         return attributes.flatMap(\.referencedEntities)
     }
     internal func attribute(for keyPath: AnyKeyPath) -> EntityAttribute? {
@@ -27,7 +27,7 @@ extension AnyEntityDescription {
     }
 }
 
-public struct EntityDescription<E: Entity>: AnyEntityDescription {
+public struct EntityDescription<E: Storable>: AnyEntityDescription {
     public var name: String
     internal let idKeyPath: KeyPath<E, E.ID>
     public internal(set) var attributes: Array<EntityAttribute>

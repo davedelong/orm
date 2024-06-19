@@ -90,21 +90,21 @@ public enum PersistentType {
 }
 
 public protocol ForeignKeyValue: PersistentValue {
-    static var targetEntity: any Entity.Type { get }
+    static var targetEntity: any Storable.Type { get }
     static var targetKeyPath: AnyKeyPath { get }
 }
 
 extension Optional: ForeignKeyValue where Wrapped: ForeignKeyValue {
-    public static var targetEntity: any Entity.Type { Wrapped.targetEntity }
+    public static var targetEntity: any Storable.Type { Wrapped.targetEntity }
     public static var targetKeyPath: AnyKeyPath { Wrapped.targetKeyPath }
 }
 
 extension Array: ForeignKeyValue where Element: ForeignKeyValue {
-    public static var targetEntity: any Entity.Type { Element.targetEntity }
+    public static var targetEntity: any Storable.Type { Element.targetEntity }
     public static var targetKeyPath: AnyKeyPath { Element.targetKeyPath }
 }
 
 extension Set: ForeignKeyValue where Element: ForeignKeyValue {
-    public static var targetEntity: any Entity.Type { Element.targetEntity }
+    public static var targetEntity: any Storable.Type { Element.targetEntity }
     public static var targetKeyPath: AnyKeyPath { Element.targetKeyPath }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 internal struct _EntityDescription {
     
-    let entity: any Entity.Type
+    let entity: any Storable.Type
     let lookup: Bimap<String, AnyKeyPath>
     
     var name: String
@@ -18,7 +18,7 @@ internal struct _EntityDescription {
     var indexes = Array<_IndexedProperties>()
     var uniqueProperties = Array<_UniqueProperties>()
     
-    init(entity: any Entity.Type) {
+    init(entity: any Storable.Type) {
         self.entity = entity
         self.lookup = entity.propertyLookup
         self.name = "\(entity)"
@@ -39,7 +39,7 @@ internal struct _RelationshipProperty {
     var name: String
     var keyPath: AnyKeyPath
     
-    var destinationEntity: any Entity.Type
+    var destinationEntity: any Storable.Type
     var isToMany: Bool
     var deleteRule: ReferenceAction?
 }

@@ -14,7 +14,7 @@ public struct Schema: CustomStringConvertible {
     
     internal let entities: Array<AnyEntityDescription>
     
-    public init(entities: any Entity.Type...) throws {
+    public init(entities: any Storable.Type...) throws {
         var descriptions = Array<AnyEntityDescription>()
         
         var seen = Set<ObjectIdentifier>()

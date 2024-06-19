@@ -8,12 +8,12 @@
 import Foundation
 
 public protocol Property<EntityType> {
-    associatedtype EntityType: Entity
+    associatedtype EntityType: Storable
     
     var name: String { get set }
 }
 
-public struct StoredProperty<E: Entity, V: PersistentValue>: Property {
+public struct StoredProperty<E: Storable, V: PersistentValue>: Property {
     public typealias EntityType = E
     
     internal var _property: _StoredProperty

@@ -9,7 +9,7 @@ import Foundation
 
 internal enum EntityConstraint {
     case foreignKey(source: AnyKeyPath,
-                    target: any Entity.Type,
+                    target: any Storable.Type,
                     onUpdate: ReferenceAction?,
                     onDelete: ReferenceAction?)
     

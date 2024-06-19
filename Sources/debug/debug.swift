@@ -8,7 +8,7 @@
 import Foundation
 import ORM
 
-struct Account: Entity {
+struct Account: Storable {
     typealias RawID = Int
     
     static var entityDescription: EntityDescription<Account> {
@@ -29,7 +29,7 @@ struct Account: Entity {
         }
     }
     
-    var id: EntityID<Self, Int>
+    var id: StoredID<Self, Int>
     var parentID: ID?
     var email: String
     
@@ -42,9 +42,9 @@ struct Settings: PersistentValue {
     var permissionLevel: Int
 }
 
-struct User: Entity {
+struct User: Storable {
     typealias RawID = UUID
-    var id: EntityID<Self, UUID>
+    var id: StoredID<Self, UUID>
     var name: String? = nil
     var email: String? = nil
     var aliases: Array<String>
@@ -53,9 +53,9 @@ struct User: Entity {
     var computers: Array<Computer.ID>
 }
 
-struct Computer: Entity {
+struct Computer: Storable {
     typealias RawID = UUID
-    var id: EntityID<Self, UUID>
+    var id: StoredID<Self, UUID>
     var name: String
     var owner: User.ID?
 }

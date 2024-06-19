@@ -7,17 +7,17 @@
 
 import Foundation
 
-public struct EntityID<E: Entity, V: EntityIDType>: Hashable, PersistentValue, ForeignKeyValue {
-    public static var semantics: _PersistentValueSemantics { 
+public struct StoredID<E: Storable, V: EntityIDType>: Hashable, PersistentValue, ForeignKeyValue {
+    public static var semantics: _PersistentValueSemantics {
         get throws { try V.semantics }
     }
-    public static func coerce(_ value: Any) -> EntityID<E, V>? {
+    public static func coerce(_ value: Any) -> StoredID<E, V>? {
         if let id = value as? Self { return id }
         if let raw = V.coerce(value) { return .init(rawValue: raw) }
         return nil
     }
     
-    public static var targetEntity: any Entity.Type { E.self }
+    public static var targetEntity: any Storable.Type { E.self }
     public static var targetKeyPath: AnyKeyPath { E.idKeyPath }
     
     internal var actualValue: V?
@@ -45,7 +45,7 @@ public protocol EntityIDType: PersistentValue & Hashable {
     static var behavior: EntityIDBehavior { get }
 }
 
-extension EntityID: EntityIDType {
+extension StoredID: EntityIDType {
     public static var behavior: EntityIDBehavior { V.behavior }
 }
 

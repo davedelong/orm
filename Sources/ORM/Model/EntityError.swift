@@ -14,7 +14,7 @@ public enum EntityError: Error {
     case invalidAttribute(String, AnyKeyPath)
     
     case invalidDefaultValue(String, Any)
-    case missingID(any Entity.Type)
+    case missingID(any Storable.Type)
 }
 
 

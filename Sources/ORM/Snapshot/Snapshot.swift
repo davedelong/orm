@@ -8,7 +8,7 @@
 import Foundation
 
 @dynamicMemberLookup
-public struct Snapshot<E: Entity> {
+public struct Snapshot<E: Storable> {
     private let entity: EntityDescription<E>
     private let values: Dictionary<String, Any>
     

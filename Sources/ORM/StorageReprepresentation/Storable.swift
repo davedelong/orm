@@ -7,15 +7,14 @@
 
 import Foundation
 
-public protocol Entity: Identifiable where ID == EntityID<Self, RawID> {
+public protocol Storable: Identifiable where ID == StoredID<Self, RawID> {
+    associatedtype Representation: StorageRepresentation
     associatedtype RawID: EntityIDType
     
-    static var entityDescription: EntityDescription<Self> { get throws }
-    
-    static func build() throws -> EntityBuilder<Self>
+    static var storageRepresentation: Representation { get }
 }
 
-extension Entity {
+extension Storable {
     internal static var erasedEntityDescription: AnyEntityDescription {
         get throws { try entityDescription }
     }
@@ -34,7 +33,7 @@ extension Entity {
     internal static func buildDescription() throws -> _EntityDescription { try build()._desc }
 }
 
-extension Entity {
+extension Storable {
     internal static var idKeyPath: KeyPath<Self, Self.ID> { \.id }
     
     internal static var idSemantics: _PersistentValueSemantics {
@@ -43,7 +42,7 @@ extension Entity {
     internal static var name: String { "\(Self.self)" }
 }
 
-extension Entity {
+extension Storable {
     
     internal static var properties: Array<(String, AnyKeyPath)> {
         return lookupLock.withLock { withLock_properties }

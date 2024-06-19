@@ -66,7 +66,7 @@ extension EntityConstraint: _HierarchicalStringConvertible {
         let indent = String(indent: level)
         switch self {
             case .foreignKey(source: let baseKeyPath, target: let targetType, onUpdate: let onUpdate, onDelete: let onDelete):
-                let baseEntityType = baseKeyPath.erasedRootType as! any Entity.Type
+                let baseEntityType = baseKeyPath.erasedRootType as! any Storable.Type
                 let baseEntityDesc = try! baseEntityType.erasedDefaultEntityDescription
                 let baseName = baseEntityDesc.name(for: baseKeyPath)!
                 
@@ -82,12 +82,12 @@ extension EntityConstraint: _HierarchicalStringConvertible {
                 }
                 return [indent+base]
             case .unique(properties: let keyPaths):
-                let baseEntityType = keyPaths[0].erasedRootType as! any Entity.Type
+                let baseEntityType = keyPaths[0].erasedRootType as! any Storable.Type
                 let baseEntityDesc = try! baseEntityType.erasedDefaultEntityDescription
                 let names = keyPaths.map { baseEntityDesc.name(for: $0)! }.joined(separator: ", ")
                 return [indent+"UNIQUE (\(names))"]
             case .indexed(property: let keyPath):
-                let baseEntityType = keyPath.erasedRootType as! any Entity.Type
+                let baseEntityType = keyPath.erasedRootType as! any Storable.Type
                 let baseEntityDesc = try! baseEntityType.erasedDefaultEntityDescription
                 return [indent+"INDEXED \(baseEntityDesc.name(for: keyPath)!)"]
         }
