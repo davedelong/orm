@@ -23,7 +23,9 @@ public struct PrimitiveType {
     internal let rawType: SQLDataType
 }
 
-public struct PrimitiveRepresentation: StorageRepresentation/*, _StorageRepresentation*/ {
+public struct PrimitiveRepresentation<StoredType: Storable>: StorageRepresentation {
+    
+    public var name: String?
     internal let primitiveType: PrimitiveType
     
     public init(_ primitiveType: PrimitiveType) {
@@ -32,133 +34,135 @@ public struct PrimitiveRepresentation: StorageRepresentation/*, _StorageRepresen
 }
 
 extension UUID: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.uuid)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<UUID>(.uuid)
     }
 }
 
 extension Bool: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.boolean)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.boolean)
     }
 }
 
 extension String: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.string)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.string)
     }
 }
 
 extension Int: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension Int8: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension Int16: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension Int32: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension Int64: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension UInt: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension UInt8: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension UInt16: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension UInt32: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension UInt64: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.integer)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.integer)
     }
 }
 
 extension Data: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.binary)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.binary)
     }
 }
 
 extension URL: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.string)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.string)
     }
 }
 
 extension Date: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.timestamp)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.timestamp)
     }
 }
 
 extension Double: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.floatingPoint)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.floatingPoint)
     }
 }
 
 extension Float: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.floatingPoint)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.floatingPoint)
     }
 }
 
 extension Float16: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.floatingPoint)
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        PrimitiveRepresentation<Self>(.floatingPoint)
     }
 }
 
 extension Optional: Storable where Wrapped: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
         return OptionalStorage<Wrapped>()
     }
 }
 
 extension Array: Storable where Element: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
         return OrderedManyStorage<Element>()
     }
+    public static var missingValue: Array<Element>? { [] }
 }
 
 extension Set: Storable where Element: Storable {
-    public static var storageRepresentation: some StorageRepresentation {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
         return UnorderedManyStorage<Element>()
     }
+    public static var missingValue: Set<Element>? { [] }
 }

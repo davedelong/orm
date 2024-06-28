@@ -11,7 +11,7 @@ import Foundation
 extension RawRepresentable where Self: Storable, RawValue: Storable {
     
     public static var storageRepresentation: some StorageRepresentation {
-        RawValue.storageRepresentation
+        BoxedRepresentation(outer: Self.self, inner: RawValue.storageRepresentation)
     }
     
     public static var missingValue: Self? {
@@ -25,7 +25,7 @@ extension RawRepresentable where Self: Storable, RawValue: Storable {
 extension Encodable where Self: Storable & Decodable {
     
     public static var storageRepresentation: some StorageRepresentation {
-        PrimitiveRepresentation(.codable)
+        PrimitiveRepresentation<Self>(.codable)
     }
     
 }

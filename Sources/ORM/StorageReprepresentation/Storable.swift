@@ -8,26 +8,24 @@
 import Foundation
 
 public protocol Storable {
-    associatedtype Representation: StorageRepresentation
-    
-    static var storageRepresentation: Representation { get }
+    static var storageRepresentation: any StorageRepresentation<Self> { get }
     static var missingValue: Self? { get }
 }
 
 extension Storable {
-    
-    public static var missingValue: Self? {
-        return nil
-    }
-    
+    public static var missingValue: Self? { nil }
 }
 
-extension Storable where Representation == StoredRepresentation<Self> {
-    
-    public static var storageRepresentation: Representation {
+extension Storable {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
         return StoredRepresentation(Self.self)
     }
-    
+}
+
+extension Storable where Self: RawRepresentable, RawValue: Storable {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
+        BoxedRepresentation(inner: RawValue.storageRepresentation)
+    }
 }
 
 extension Storable {

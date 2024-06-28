@@ -12,57 +12,18 @@ import NIOCore
 
 public struct Schema: CustomStringConvertible {
     
-    internal let entities: Array<_StoredObjectDescription>
-    
-    public init(entities: any Storable.Type...) throws {
+    public init(types: any Storable.Type...) throws {
+        let builder = _StorageBuilder()
         
-        var descriptions = Array<_StoredObjectDescription>()
-        var objectsAndNames = Bimap<ObjectIdentifier, String>()
-        
-        var entitiesToProcess = entities
-        
-        while entitiesToProcess.count > 0 {
-            let next = entitiesToProcess.removeFirst()
-            
-            let rep = next.storageRepresentation as! _StorageRepresentation
-            let objectID = next.id
-            
-            let description = rep.description
-            
-            let name = description.name
-            
-            if let existingName = objectsAndNames[objectID] {
-                guard existingName == name else {
-                    throw StorableError("The Storable type '\(description.entity)' can only have a single name in a schema, not two: \(name) and \(existingName)")
-                }
-                
-                // this id has already been processed
-                continue
-            }
-            
-            if let existingID = objectsAndNames[name] {
-                guard existingID == objectID else {
-                    throw StorableError("The name '\(name)' cannot be used for two different Storable types")
-                }
-                
-                // this name has already been processed. this should be unreachable
-                continue
-            }
-            
-            objectsAndNames[name] = objectID
-            
-            entitiesToProcess.append(contentsOf: description.relatedTypes)
-            
-            // TODO: validate the type
-            
-            descriptions.append(description)
+        for type in types {
+            let rep = type.storageRepresentation as any StorageRepresentation
+            print(type, "->", rep)
+            try rep._build(into: builder)
         }
-        
-        self.entities = descriptions
     }
     
     public var description: String {
-        return "[" + entities.map({ "\($0)" }).joined(separator: "\n") + "]"
+        return "[]"
     }
     
     public func run() throws {
