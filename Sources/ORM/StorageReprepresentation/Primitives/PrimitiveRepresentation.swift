@@ -25,7 +25,6 @@ public struct PrimitiveType {
 
 public struct PrimitiveRepresentation<StoredType: Storable>: StorageRepresentation {
     
-    public var name: String?
     internal let primitiveType: PrimitiveType
     
     public init(_ primitiveType: PrimitiveType) {

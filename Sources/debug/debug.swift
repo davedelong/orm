@@ -9,11 +9,9 @@ import Foundation
 import ORM
 
 struct Account: Storable, Identifiable {
-    typealias RawID = Int
-    
-    static var storageRepresentation: some StorageRepresentation {
-        StoredRepresentation(Self.self) {
-            Property(keyPath: \.id)
+    static var storageRepresentation: any StorageRepresentation<Self> {
+        StoredRepresentation {
+            Property(keyPath: \Self.id)
             Property(keyPath: \.email)
             Property(keyPath: \.settings)
             
@@ -27,6 +25,12 @@ struct Account: Storable, Identifiable {
     
     var computers: Array<Computer.ID>
     var settings: Settings
+}
+
+enum Permission: String, Storable {
+    case admin
+    case moderator
+    case user
 }
 
 struct Settings: Storable {
@@ -63,7 +67,7 @@ struct Computer: Storable, Identifiable {
 @main
 struct Debug {
     static func main() async throws {
-        let schema = try Schema(entities: Account.self)
+        let schema = try Schema(types: Account.self, Permission.self)
         print(schema)
         
         

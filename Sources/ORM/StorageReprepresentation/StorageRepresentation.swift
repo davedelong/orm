@@ -10,7 +10,6 @@ import Foundation
 public protocol StorageRepresentation<StoredType> {
     associatedtype StoredType: Storable
     
-    var name: String? { get set }
     func _build(into builder: _StorageBuilder) throws
 }
 
@@ -23,7 +22,6 @@ extension StorageRepresentation {
 internal struct OptionalStorage<Inner: Storable>: StorageRepresentation {
     typealias StoredType = Inner?
     
-    var name: String?
     var inner: any StorageRepresentation
     
     init() {
@@ -34,7 +32,6 @@ internal struct OptionalStorage<Inner: Storable>: StorageRepresentation {
 internal struct OrderedManyStorage<Inner: Storable>: StorageRepresentation {
     typealias StoredType = Array<Inner>
     
-    var name: String?
     var inner: any StorageRepresentation
     
     init() {
@@ -45,7 +42,6 @@ internal struct OrderedManyStorage<Inner: Storable>: StorageRepresentation {
 internal struct UnorderedManyStorage<Inner: Storable & Hashable>: StorageRepresentation {
     typealias StoredType = Set<Inner>
     
-    var name: String?
     var inner: any StorageRepresentation
     
     init() {
@@ -56,7 +52,6 @@ internal struct UnorderedManyStorage<Inner: Storable & Hashable>: StorageReprese
 internal struct BoxedRepresentation<Outer: Storable>: StorageRepresentation {
     typealias StoredType = Outer
     
-    var name: String?
     var inner: any StorageRepresentation
     
     init(outer: Outer.Type = Outer.self, inner: any StorageRepresentation) {

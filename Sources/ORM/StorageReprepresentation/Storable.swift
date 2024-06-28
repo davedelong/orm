@@ -13,19 +13,12 @@ public protocol Storable {
 }
 
 extension Storable {
-    public static var missingValue: Self? { nil }
-}
-
-extension Storable {
+    @_disfavoredOverload
     public static var storageRepresentation: any StorageRepresentation<Self> {
         return StoredRepresentation(Self.self)
     }
-}
-
-extension Storable where Self: RawRepresentable, RawValue: Storable {
-    public static var storageRepresentation: any StorageRepresentation<Self> {
-        BoxedRepresentation(inner: RawValue.storageRepresentation)
-    }
+    
+    public static var missingValue: Self? { nil }
 }
 
 extension Storable {

@@ -10,7 +10,7 @@ import Foundation
 // any RawRepresentable with a RawValue: PersistentValue
 extension RawRepresentable where Self: Storable, RawValue: Storable {
     
-    public static var storageRepresentation: some StorageRepresentation {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
         BoxedRepresentation(outer: Self.self, inner: RawValue.storageRepresentation)
     }
     
@@ -24,7 +24,7 @@ extension RawRepresentable where Self: Storable, RawValue: Storable {
 
 extension Encodable where Self: Storable & Decodable {
     
-    public static var storageRepresentation: some StorageRepresentation {
+    public static var storageRepresentation: any StorageRepresentation<Self> {
         PrimitiveRepresentation<Self>(.codable)
     }
     
