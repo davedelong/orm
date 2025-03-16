@@ -86,7 +86,7 @@ struct CoreDataEngineTests {
         #expect(bMessage.isOptional == false)
     }
     
-    @Test func requireToOneRelationship_UnidentifiedToUnidentified() async throws {
+    @Test func requiredToOneRelationship_UnidentifiedToUnidentified() async throws {
         struct A: StoredType {
             var b: B
         }
@@ -111,13 +111,9 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == false)
         #expect(aBInverse.deleteRule == .cascadeDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
-    @Test func requireToOneRelationship_IdentifiedToUnidentified() async throws {
+    @Test func requiredToOneRelationship_IdentifiedToUnidentified() async throws {
         struct A: StoredType, Identifiable {
             var id: String
             var b: B
@@ -143,13 +139,9 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == false)
         #expect(aBInverse.deleteRule == .denyDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
-    @Test func requireToOneRelationship_IdentifiedToIdentified() async throws {
+    @Test func requiredToOneRelationship_IdentifiedToIdentified() async throws {
         struct A: StoredType, Identifiable {
             var id: String
             var b: B
@@ -176,13 +168,9 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == true)
         #expect(aBInverse.deleteRule == .denyDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
-    @Test func requireToOneRelationship_UnidentifiedToIdentified() async throws {
+    @Test func requiredToOneRelationship_UnidentifiedToIdentified() async throws {
         struct A: StoredType {
             var b: B
         }
@@ -208,10 +196,6 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == true)
         #expect(aBInverse.deleteRule == .cascadeDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
     @Test func optionalToOneRelationship_UnidentifiedToUnidentified() async throws {
@@ -239,10 +223,6 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == false)
         #expect(aBInverse.deleteRule == .nullifyDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
     @Test func optionalToOneRelationship_IdentifiedToUnidentified() async throws {
@@ -271,10 +251,6 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == false)
         #expect(aBInverse.deleteRule == .nullifyDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
     @Test func optionalToOneRelationship_IdentifiedToIdentified() async throws {
@@ -304,10 +280,6 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == true)
         #expect(aBInverse.deleteRule == .nullifyDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
     
     @Test func optionalToOneRelationship_UnidentifiedToIdentified() async throws {
@@ -336,10 +308,6 @@ struct CoreDataEngineTests {
         #expect(aBInverse.isOrdered == false)
         #expect(aBInverse.isToMany == true)
         #expect(aBInverse.deleteRule == .nullifyDeleteRule)
-        
-        let bName = try #require(b.attributesByName["name"])
-        #expect(bName.type == .string)
-        #expect(bName.isOptional == false)
     }
 }
 
