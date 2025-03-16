@@ -12,7 +12,10 @@ internal struct Bimap<L: Hashable, R: Hashable>: CustomStringConvertible {
     private var leftToRight: Dictionary<L, R>
     private var rightToLeft: Dictionary<R, L>
     
-    internal var description: String { "Bimap<L, R>(\(leftToRight.count))" }
+    internal var description: String {
+        let pairs = leftToRight.map { "\($0) <-> \($1)" }.joined(separator: ", ")
+        return "Bimap<\(L.self), \(R.self)>(\(leftToRight.count): \(pairs))"
+    }
     
     internal init() {
         leftToRight = [:]

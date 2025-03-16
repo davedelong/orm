@@ -7,9 +7,9 @@
 
 import Foundation
 
-//func fields(of type: Any.Type) -> Array<(String, AnyKeyPath)> {
-//    _openExistential(type, do: fields(of:))
-//}
+func fields(of type: Any.Type) -> Array<(String, AnyKeyPath)> {
+    _openExistential(type, do: fields(of:))
+}
 
 func fields<T>(of type: T.Type = T.self) -> Array<(String, PartialKeyPath<T>)> {
     var all = Array<(String, PartialKeyPath<T>)>()
