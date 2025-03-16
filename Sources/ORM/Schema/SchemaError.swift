@@ -18,15 +18,21 @@ extension Schema {
                     return l == r
                 case (.storedTypeIsNotIdentifiable(let l), .storedTypeIsNotIdentifiable(let r)):
                     return l == r
-                case (.storedTypeIsNotValueType(let l), .storedTypeIsNotValueType(let r)):
+                case (.storedTypeMustBeValueType(let l), .storedTypeMustBeValueType(let r)):
                     return l == r
                 
                 case (.identifierCannotBeOptional(let l), .identifierCannotBeOptional(let r)):
                     return l == r
-                case (.identifierIsNotPrimitive(let l), .identifierIsNotPrimitive(let r)):
+                case (.identifierMustBePrimitive(let l), .identifierMustBePrimitive(let r)):
                     return l == r
                 
                 case (.unknownFieldType(let lType, let lName, _, _), .unknownFieldType(let rType, let rName, _, _)):
+                    return lType == rType && lName == rName
+                    
+                case (.dictionaryKeyCannotBeOptional(let lType, let lName, _, _), .dictionaryKeyCannotBeOptional(let rType, let rName, _, _)):
+                    return lType == rType && lName == rName
+                    
+                case (.dictionaryKeyMustBePrimitive(let lType, let lName, _, _), .dictionaryKeyMustBePrimitive(let rType, let rName, _, _)):
                     return lType == rType && lName == rName
                 
                 default:
@@ -37,12 +43,15 @@ extension Schema {
         case storedTypeMissingIdentifier(any StoredType.Type)
         case storedTypeIsEmpty(any StoredType.Type)
         case storedTypeIsNotIdentifiable(any StoredType.Type)
-        case storedTypeIsNotValueType(any StoredType.Type)
+        case storedTypeMustBeValueType(any StoredType.Type)
         
         case identifierCannotBeOptional(any StoredType.Type)
-        case identifierIsNotPrimitive(any StoredType.Type)
+        case identifierMustBePrimitive(any StoredType.Type)
         
         case unknownFieldType(any StoredType.Type, String, AnyKeyPath, Any.Type)
+        
+        case dictionaryKeyCannotBeOptional(any StoredType.Type, String, AnyKeyPath, Any.Type)
+        case dictionaryKeyMustBePrimitive(any StoredType.Type, String, AnyKeyPath, Any.Type)
     }
     
 }

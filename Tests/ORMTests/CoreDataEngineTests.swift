@@ -85,6 +85,134 @@ struct CoreDataEngineTests {
         #expect(bMessage.attributeType == .stringAttributeType)
         #expect(bMessage.isOptional == false)
     }
+    
+    @Test func requireToOneRelationship_UnidentifiedToUnidentified() async throws {
+        struct A: StoredType {
+            var b: B
+        }
+        
+        struct B: StoredType {
+            var name: String
+        }
+        
+        let e = try CoreDataEngine(A.self)
+        
+        let a = try #require(await e.model.entitiesByName["A"])
+        let b = try #require(await e.model.entitiesByName["B"])
+        
+        let aB = try #require(a.relationshipsByName["b"])
+        #expect(aB.isOrdered == false)
+        #expect(aB.isToMany == false)
+        #expect(aB.isOptional == false)
+        #expect(aB.deleteRule == .cascadeDeleteRule)
+        
+        let aBInverse = try #require(aB.inverseRelationship)
+        #expect(aBInverse.name == "A_b")
+        #expect(aBInverse.isOrdered == false)
+        #expect(aBInverse.isToMany == false) // this is false because B is not Identifiable
+        #expect(aBInverse.deleteRule == .cascadeDeleteRule)
+        
+        let bName = try #require(b.attributesByName["name"])
+        #expect(bName.type == .string)
+        #expect(bName.isOptional == false)
+    }
+    
+    @Test func requireToOneRelationship_IdentifiedToUnidentified() async throws {
+        struct A: StoredType, Identifiable {
+            var id: String
+            var b: B
+        }
+        
+        struct B: StoredType {
+            var name: String
+        }
+        
+        let e = try CoreDataEngine(A.self)
+        
+        let a = try #require(await e.model.entitiesByName["A"])
+        let b = try #require(await e.model.entitiesByName["B"])
+        
+        let aB = try #require(a.relationshipsByName["b"])
+        #expect(aB.isOrdered == false)
+        #expect(aB.isToMany == false)
+        #expect(aB.isOptional == false)
+        #expect(aB.deleteRule == .cascadeDeleteRule)
+        
+        let aBInverse = try #require(aB.inverseRelationship)
+        #expect(aBInverse.name == "A_b")
+        #expect(aBInverse.isOrdered == false)
+        #expect(aBInverse.isToMany == false) // this is false because B is not Identifiable
+        #expect(aBInverse.deleteRule == .denyDeleteRule)
+        
+        let bName = try #require(b.attributesByName["name"])
+        #expect(bName.type == .string)
+        #expect(bName.isOptional == false)
+    }
+    
+    @Test func requireToOneRelationship_IdentifiedToIdentified() async throws {
+        struct A: StoredType, Identifiable {
+            var id: String
+            var b: B
+        }
+        
+        struct B: StoredType, Identifiable {
+            var id: String
+            var name: String
+        }
+        
+        let e = try CoreDataEngine(A.self)
+        
+        let a = try #require(await e.model.entitiesByName["A"])
+        let b = try #require(await e.model.entitiesByName["B"])
+        
+        let aB = try #require(a.relationshipsByName["b"])
+        #expect(aB.isOrdered == false)
+        #expect(aB.isToMany == false)
+        #expect(aB.isOptional == false)
+        #expect(aB.deleteRule == .nullifyDeleteRule)
+        
+        let aBInverse = try #require(aB.inverseRelationship)
+        #expect(aBInverse.name == "A_b")
+        #expect(aBInverse.isOrdered == false)
+        #expect(aBInverse.isToMany == true) // this is false because B is not Identifiable
+        #expect(aBInverse.deleteRule == .denyDeleteRule)
+        
+        let bName = try #require(b.attributesByName["name"])
+        #expect(bName.type == .string)
+        #expect(bName.isOptional == false)
+    }
+    
+    @Test func requireToOneRelationship_UnidentifiedToIdentified() async throws {
+        struct A: StoredType {
+            var b: B
+        }
+        
+        struct B: StoredType, Identifiable {
+            var id: String
+            var name: String
+        }
+        
+        let e = try CoreDataEngine(A.self)
+        
+        let a = try #require(await e.model.entitiesByName["A"])
+        let b = try #require(await e.model.entitiesByName["B"])
+        
+        let aB = try #require(a.relationshipsByName["b"])
+        #expect(aB.isOrdered == false)
+        #expect(aB.isToMany == false)
+        #expect(aB.isOptional == false)
+        #expect(aB.deleteRule == .nullifyDeleteRule)
+        
+        let aBInverse = try #require(aB.inverseRelationship)
+        #expect(aBInverse.name == "A_b")
+        #expect(aBInverse.isOrdered == false)
+        #expect(aBInverse.isToMany == true) // this is false because B is not Identifiable
+        #expect(aBInverse.deleteRule == .cascadeDeleteRule)
+        
+        let bName = try #require(b.attributesByName["name"])
+        #expect(bName.type == .string)
+        #expect(bName.isOptional == false)
+    }
 }
 
 #endif

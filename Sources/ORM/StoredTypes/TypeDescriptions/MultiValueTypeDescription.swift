@@ -5,13 +5,13 @@
 //  Created by Dave DeLong on 3/15/25.
 //
 
-struct MultiValueTypeDescription: StoredTypeDescription {
-    var baseType: any StoredType.Type
-    var isOrdered: Bool
-    var keyType: StoredTypeDescription?
-    var valueType: StoredTypeDescription
+public struct MultiValueTypeDescription: StoredTypeDescription {
+    public var baseType: any StoredType.Type
+    public var isOrdered: Bool
+    public var keyType: StoredTypeDescription?
+    public var valueType: StoredTypeDescription
     
-    var transitiveTypeDescriptions: Array<any StoredTypeDescription> {
+    public var transitiveTypeDescriptions: Array<any StoredTypeDescription> {
         if let keyType { return [keyType, valueType] }
         return [valueType]
     }

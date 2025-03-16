@@ -21,7 +21,7 @@ public struct CompositeTypeDescription: StoredTypeDescription {
     }
     
     init<S: StoredType & AnyObject>(_ type: S.Type) throws(Schema.Error) {
-        throw .storedTypeIsNotValueType(S.self)
+        throw .storedTypeMustBeValueType(S.self)
     }
     
     init<S: StoredType>(_ type: S.Type) throws(Schema.Error) {
@@ -53,10 +53,23 @@ public struct CompositeTypeDescription: StoredTypeDescription {
             }
             
             if description.isOptional { throw .identifierCannotBeOptional(S.self) }
-            guard description is PrimitiveTypeDescription else { throw .identifierIsNotPrimitive(S.self) }
+            guard description is PrimitiveTypeDescription else { throw .identifierMustBePrimitive(S.self) }
             
         } else if isIdentifiable {
             throw .storedTypeMissingIdentifier(S.self)
+        }
+        
+        for (name, keyPath, description) in fields {
+            guard let multi = description as? MultiValueTypeDescription else { continue }
+            guard let key = multi.keyType else { continue }
+            
+            if key is OptionalTypeDescription {
+                throw .dictionaryKeyCannotBeOptional(S.self, name, keyPath, key.baseType)
+            }
+            
+            if (key is PrimitiveTypeDescription) == false {
+                throw .dictionaryKeyMustBePrimitive(S.self, name, keyPath, key.baseType)
+            }
         }
         
         self.fields = fields

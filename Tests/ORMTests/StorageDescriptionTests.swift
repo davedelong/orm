@@ -6,7 +6,7 @@ struct SchemaTests {
     
     @Test func storedTypeCannotBeAClass() {
         class S: StoredType { }
-        #expect(throws: Schema.Error.storedTypeIsNotValueType(S.self)) { try Schema(S.self) }
+        #expect(throws: Schema.Error.storedTypeMustBeValueType(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotBeEmpty() {
@@ -27,7 +27,7 @@ struct SchemaTests {
             var id: Array<Int>
         }
         
-        #expect(throws: Schema.Error.identifierIsNotPrimitive(S.self)) { try Schema(S.self) }
+        #expect(throws: Schema.Error.identifierMustBePrimitive(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotHaveComputedIdentifier() {
@@ -63,7 +63,7 @@ struct SchemaTests {
             var id: ID
         }
         
-        #expect(throws: Schema.Error.identifierIsNotPrimitive(S.self)) { try Schema(S.self) }
+        #expect(throws: Schema.Error.identifierMustBePrimitive(S.self)) { try Schema(S.self) }
     }
     
     @Test func schemaIgnoresDuplicateDeclaredTypes() throws {
@@ -100,5 +100,24 @@ struct SchemaTests {
         
         let s = try #require(try Schema(A.self, B.self))
         try #require(s.compositeTypes.count == 3)
+    }
+    
+    @Test func storedDictionaryCannotHaveOptionalKey() throws {
+        struct A: StoredType {
+            var map: Dictionary<String?, Int>
+        }
+        
+        #expect(throws: Schema.Error.dictionaryKeyCannotBeOptional(A.self, "map", \A.map, String?.self)) { try Schema(A.self) }
+    }
+    
+    @Test func storedDictionaryCannotHaveComplexKey() throws {
+        struct A: StoredType {
+            var map: Dictionary<B, Int>
+        }
+        struct B: StoredType, Hashable {
+            var value: Int
+        }
+        
+        #expect(throws: Schema.Error.dictionaryKeyMustBePrimitive(A.self, "map", \A.map, String?.self)) { try Schema(A.self) }
     }
 }

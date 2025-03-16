@@ -17,6 +17,10 @@ public struct Schema {
         storedTypes.compactMap({ $0 as? PrimitiveTypeDescription })
     }
     
+    public var multiValueTypes: Array<MultiValueTypeDescription> {
+        storedTypes.compactMap({ $0 as? MultiValueTypeDescription })
+    }
+    
     public var baseTypes: Array<any StoredType.Type> {
         storedTypes.map(\.baseType)
     }
