@@ -29,6 +29,9 @@ extension Schema {
                 case (.unknownFieldType(let lType, let lName, _, _), .unknownFieldType(let rType, let rName, _, _)):
                     return lType == rType && lName == rName
                     
+                case (.multiValueFieldsCannotBeOptional(let lType, let lName, _, _), .multiValueFieldsCannotBeOptional(let rType, let rName, _, _)):
+                    return lType == rType && lName == rName
+                    
                 case (.dictionaryKeyCannotBeOptional(let lType, let lName, _, _), .dictionaryKeyCannotBeOptional(let rType, let rName, _, _)):
                     return lType == rType && lName == rName
                     
@@ -49,6 +52,8 @@ extension Schema {
         case identifierMustBePrimitive(any StoredType.Type)
         
         case unknownFieldType(any StoredType.Type, String, AnyKeyPath, Any.Type)
+        
+        case multiValueFieldsCannotBeOptional(any StoredType.Type, String, AnyKeyPath, Any.Type)
         
         case dictionaryKeyCannotBeOptional(any StoredType.Type, String, AnyKeyPath, Any.Type)
         case dictionaryKeyMustBePrimitive(any StoredType.Type, String, AnyKeyPath, Any.Type)

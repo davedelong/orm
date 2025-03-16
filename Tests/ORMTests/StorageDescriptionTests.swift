@@ -120,4 +120,12 @@ struct SchemaTests {
         
         #expect(throws: Schema.Error.dictionaryKeyMustBePrimitive(A.self, "map", \A.map, String?.self)) { try Schema(A.self) }
     }
+    
+    @Test func multiValueFieldsCannotBeOptional() throws {
+        struct A: StoredType {
+            var ints: Array<Int>?
+        }
+        
+        #expect(throws: Schema.Error.multiValueFieldsCannotBeOptional(A.self, "ints", \A.ints, Array<Int>?.self)) { try Schema(A.self) }
+    }
 }

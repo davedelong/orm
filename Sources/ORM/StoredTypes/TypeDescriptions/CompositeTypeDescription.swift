@@ -60,6 +60,12 @@ public struct CompositeTypeDescription: StoredTypeDescription {
         }
         
         for (name, keyPath, description) in fields {
+            if let opt = description as? OptionalTypeDescription {
+                guard opt.wrappedType is MultiValueTypeDescription == false else {
+                    throw .multiValueFieldsCannotBeOptional(S.self, name, keyPath, description.baseType)
+                }
+            }
+            
             guard let multi = description as? MultiValueTypeDescription else { continue }
             guard let key = multi.keyType else { continue }
             
