@@ -107,7 +107,7 @@ struct SchemaTests {
             var map: Dictionary<String?, Int>
         }
         
-        #expect(throws: Schema.Error.dictionaryKeyCannotBeOptional(A.self, "map", \A.map, String?.self)) { try Schema(A.self) }
+        #expect(throws: Schema.Error.dictionaryKeyCannotBeOptional(A.self, try A.Fields.map)) { try Schema(A.self) }
     }
     
     @Test func storedDictionaryCannotHaveComplexKey() throws {
@@ -118,7 +118,7 @@ struct SchemaTests {
             var value: Int
         }
         
-        #expect(throws: Schema.Error.dictionaryKeyMustBePrimitive(A.self, "map", \A.map, String?.self)) { try Schema(A.self) }
+        #expect(throws: Schema.Error.dictionaryKeyMustBePrimitive(A.self, try A.Fields.map)) { try Schema(A.self) }
     }
     
     @Test func multiValueFieldsCannotBeOptional() throws {
@@ -126,6 +126,30 @@ struct SchemaTests {
             var ints: Array<Int>?
         }
         
-        #expect(throws: Schema.Error.multiValueFieldsCannotBeOptional(A.self, "ints", \A.ints, Array<Int>?.self)) { try Schema(A.self) }
+        #expect(throws: Schema.Error.multiValueFieldsCannotBeOptional(A.self, try A.Fields.ints)) { try Schema(A.self) }
+    }
+    
+    @Test func multiValueFieldsCannotBeNested() throws {
+        struct A: StoredType {
+            var names: Array<Array<String>>
+        }
+        
+        #expect(throws: Schema.Error.multiValueFieldsCannotBeNested(A.self, try A.Fields.names)) { try Schema(A.self) }
+    }
+    
+    @Test func dictionaryValuesCannotBeNested() throws {
+        struct A: StoredType {
+            var names: Dictionary<String, Array<String>>
+        }
+        
+        #expect(throws: Schema.Error.multiValueFieldsCannotBeNested(A.self, try A.Fields.names)) { try Schema(A.self) }
+    }
+    
+    @Test func noDoubleOptionals() throws {
+        struct A: StoredType {
+            var name: String??
+        }
+        
+        #expect(throws: Schema.Error.optionalFieldCannotNestOptional(A.self, try A.Fields.name)) { try Schema(A.self) }
     }
 }

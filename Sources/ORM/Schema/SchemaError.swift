@@ -29,14 +29,23 @@ extension Schema {
                 case (.unknownFieldType(let lType, let lName, _, _), .unknownFieldType(let rType, let rName, _, _)):
                     return lType == rType && lName == rName
                     
-                case (.multiValueFieldsCannotBeOptional(let lType, let lName, _, _), .multiValueFieldsCannotBeOptional(let rType, let rName, _, _)):
-                    return lType == rType && lName == rName
+                case (.multiValueFieldsCannotBeOptional(let lType, let lField), .multiValueFieldsCannotBeOptional(let rType, let rField)):
+                    return lType == rType && lField.name == rField.name
                     
-                case (.dictionaryKeyCannotBeOptional(let lType, let lName, _, _), .dictionaryKeyCannotBeOptional(let rType, let rName, _, _)):
-                    return lType == rType && lName == rName
+                case (.optionalFieldCannotNestOptional(let lType, let lField), .optionalFieldCannotNestOptional(let rType, let rField)):
+                    return lType == rType && lField.name == rField.name
                     
-                case (.dictionaryKeyMustBePrimitive(let lType, let lName, _, _), .dictionaryKeyMustBePrimitive(let rType, let rName, _, _)):
-                    return lType == rType && lName == rName
+                case (.multiValueFieldsCannotBeNested(let lType, let lField), .multiValueFieldsCannotBeNested(let rType, let rField)):
+                    return lType == rType && lField.name == rField.name
+                    
+                case (.dictionaryKeyCannotBeOptional(let lType, let lField), .dictionaryKeyCannotBeOptional(let rType, let rField)):
+                    return lType == rType && lField.name == rField.name
+                    
+                case (.dictionaryKeyMustBePrimitive(let lType, let lField), .dictionaryKeyMustBePrimitive(let rType, let rField)):
+                    return lType == rType && lField.name == rField.name
+                    
+                case (.multiValueFieldsCannotNestOptionals(let lType, let lField), .multiValueFieldsCannotNestOptionals(let rType, let rField)):
+                    return lType == rType && lField.name == rField.name
                 
                 default:
                     return false
@@ -53,10 +62,14 @@ extension Schema {
         
         case unknownFieldType(any StoredType.Type, String, AnyKeyPath, Any.Type)
         
-        case multiValueFieldsCannotBeOptional(any StoredType.Type, String, AnyKeyPath, Any.Type)
+        case optionalFieldCannotNestOptional(any StoredType.Type, StoredField)
         
-        case dictionaryKeyCannotBeOptional(any StoredType.Type, String, AnyKeyPath, Any.Type)
-        case dictionaryKeyMustBePrimitive(any StoredType.Type, String, AnyKeyPath, Any.Type)
+        case multiValueFieldsCannotBeOptional(any StoredType.Type, StoredField)
+        case multiValueFieldsCannotBeNested(any StoredType.Type, StoredField)
+        case multiValueFieldsCannotNestOptionals(any StoredType.Type, StoredField)
+        
+        case dictionaryKeyCannotBeOptional(any StoredType.Type, StoredField)
+        case dictionaryKeyMustBePrimitive(any StoredType.Type, StoredField)
     }
     
 }

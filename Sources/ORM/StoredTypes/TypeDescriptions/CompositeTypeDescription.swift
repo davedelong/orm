@@ -8,16 +8,14 @@
 import Foundation
 
 public struct CompositeTypeDescription: StoredTypeDescription {
-    public typealias Field = (String, AnyKeyPath, any StoredTypeDescription)
-    
     public let name: String
     public let baseType: any StoredType.Type
-    public let fields: Array<Field>
+    public let fields: Array<StoredField>
     
     public var isIdentifiable: Bool { baseType is any Identifiable.Type }
     
     public var transitiveTypeDescriptions: Array<any StoredTypeDescription> {
-        return fields.map(\.2)
+        return fields.map(\.description)
     }
     
     init<S: StoredType & AnyObject>(_ type: S.Type) throws(Schema.Error) {
@@ -27,58 +25,68 @@ public struct CompositeTypeDescription: StoredTypeDescription {
     init<S: StoredType>(_ type: S.Type) throws(Schema.Error) {
         self.baseType = type
         self.name = "\(S.self)"
-        
-        var fields = Array<Field>()
-        
-        for (name, keyPath) in S.fields {
-            let fieldType = keyPath.erasedValueType
-            
-            if let storedType = fieldType as? any StoredType.Type {
-                let description = try storedType.storedTypeDescription
-                fields.append((name, keyPath, description))
-            } else if let rawType = fieldType as? any RawRepresentable.Type, let desc = try rawType.storedTypeDescription {
-                fields.append((name, keyPath, desc))
-            } else {
-                throw .unknownFieldType(S.self, name, keyPath, fieldType)
-            }
-        }
+        self.fields = try S.storedFields
         
         if fields.isEmpty { throw .storedTypeIsEmpty(S.self) }
-        
-        let isIdentifiable = (S.self is any Identifiable.Type)
-        if let (_, _, description) = fields.first(where: { $0.0 == "id" }) {
+        try validateIdentifiable()
+        for field in fields {
+            try field.validate(on: baseType)
+        }
+    }
+    
+    private func validateIdentifiable() throws(Schema.Error) {
+        let isIdentifiable = (baseType is any Identifiable.Type)
+        if let field = fields.first(where: { $0.name == "id" }) {
             guard isIdentifiable else {
                 // a stored type with an "id" field must be Identifiable
-                throw .storedTypeIsNotIdentifiable(S.self)
+                throw .storedTypeIsNotIdentifiable(baseType)
             }
             
-            if description.isOptional { throw .identifierCannotBeOptional(S.self) }
-            guard description is PrimitiveTypeDescription else { throw .identifierMustBePrimitive(S.self) }
+            if field.description.isOptional { throw .identifierCannotBeOptional(baseType) }
+            guard field.description is PrimitiveTypeDescription else { throw .identifierMustBePrimitive(baseType) }
             
         } else if isIdentifiable {
-            throw .storedTypeMissingIdentifier(S.self)
+            throw .storedTypeMissingIdentifier(baseType)
+        }
+    }
+}
+
+extension StoredField {
+    
+    func validate(on baseType: any StoredType.Type) throws(Schema.Error) {
+        
+        if let opt = description as? OptionalTypeDescription {
+            if opt.wrappedType is MultiValueTypeDescription {
+                throw .multiValueFieldsCannotBeOptional(baseType, self)
+            }
+            
+            if opt.wrappedType is OptionalTypeDescription {
+                throw .optionalFieldCannotNestOptional(baseType, self)
+            }
         }
         
-        for (name, keyPath, description) in fields {
-            if let opt = description as? OptionalTypeDescription {
-                guard opt.wrappedType is MultiValueTypeDescription == false else {
-                    throw .multiValueFieldsCannotBeOptional(S.self, name, keyPath, description.baseType)
+        if let multi = description as? MultiValueTypeDescription {
+            // disallow eg Arrays of Arrays
+            if multi.valueType is MultiValueTypeDescription {
+                throw .multiValueFieldsCannotBeNested(baseType, self)
+            }
+            if multi.valueType is OptionalTypeDescription {
+                throw .multiValueFieldsCannotNestOptionals(baseType, self)
+            }
+            
+            if let key = multi.keyType {
+                // dictionary field
+                
+                if key is OptionalTypeDescription {
+                    throw .dictionaryKeyCannotBeOptional(baseType, self)
+                }
+                
+                if (key is PrimitiveTypeDescription) == false {
+                    throw .dictionaryKeyMustBePrimitive(baseType, self)
                 }
             }
             
-            guard let multi = description as? MultiValueTypeDescription else { continue }
-            guard let key = multi.keyType else { continue }
-            
-            if key is OptionalTypeDescription {
-                throw .dictionaryKeyCannotBeOptional(S.self, name, keyPath, key.baseType)
-            }
-            
-            if (key is PrimitiveTypeDescription) == false {
-                throw .dictionaryKeyMustBePrimitive(S.self, name, keyPath, key.baseType)
-            }
         }
-        
-        self.fields = fields
     }
     
 }
