@@ -64,4 +64,19 @@ struct SQLiteEngineTests {
         let _ = try await SQLiteEngine(S.self, at: temporaryURL())
     }
     
+    @Test func relationshipBetweenIdentifiables() async throws {
+        struct A: Identifiable, StoredType {
+            let id: UUID
+            var name: String
+        }
+        
+        struct B: Identifiable, StoredType {
+            let id: UUID
+            var name: String
+            var a: A?
+        }
+        
+        let _ = try await SQLiteEngine(A.self, B.self, at: temporaryURL())
+    }
+    
 }

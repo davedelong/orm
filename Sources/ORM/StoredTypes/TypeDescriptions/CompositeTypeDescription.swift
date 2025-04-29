@@ -14,6 +14,12 @@ public struct CompositeTypeDescription: StoredTypeDescription {
     
     public var isIdentifiable: Bool { baseType is any Identifiable.Type }
     
+    public var idField: PrimitiveTypeDescription? {
+        guard isIdentifiable else { return nil }
+        guard let field = fields.first(where: { $0.name == "id" }) else { return nil }
+        return field.description as? PrimitiveTypeDescription
+    }
+    
     public var transitiveTypeDescriptions: Array<any StoredTypeDescription> {
         return fields.map(\.description)
     }

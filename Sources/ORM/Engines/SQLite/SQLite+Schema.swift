@@ -59,17 +59,19 @@ internal struct SQLiteTable {
                 let that = Name<SQLiteSyntax.Table>(value: thatType.name)
                 if thatType.isIdentifiable {
                     // if that thing gets deleted, cascade delete this
-                    base.create.addForeignKey(name, references: that, column: "id", canBeNull: false, onDelete: .cascade)
+                    let thatIDType = thatType.idField
+                    base.create.addForeignKey(name, references: that, column: "id", type: thatIDType?.sqliteTypeName, canBeNull: false, onDelete: .cascade)
                 } else {
                     // if that thing gets deleted, do nothing
                     // Maybe we add a trigger that cascade deletes the value if this is deleted?
-                    base.create.addForeignKey(name, references: that, column: "ROWID", canBeNull: false)
+                    base.create.addForeignKey(name, references: that, column: "ROWID", type: .integer, canBeNull: false)
                 }
             } else if let o = field.description as? OptionalTypeDescription, let c = o.wrappedType as? CompositeTypeDescription {
                 let name = Name<Column>(value: field.name)
                 let that = Name<SQLiteSyntax.Table>(value: c.name)
                 let ref = Name<Column>(value: c.isIdentifiable ? "id" : "ROWID")
-                base.create.addForeignKey(name, references: that, column: ref, canBeNull: true)
+                let type: TypeName = c.idField?.sqliteTypeName ?? .integer
+                base.create.addForeignKey(name, references: that, column: ref, type: type, canBeNull: true)
             } else if let m = field.description as? MultiValueTypeDescription {
                 // need an intermediate table
                 
@@ -79,9 +81,11 @@ internal struct SQLiteTable {
                 var uniqueTuple = Array<String>()
                 
                 let parentIDColumn: Name<Column> = thisType.isIdentifiable ? "id" : "ROWID"
+                let parentIDType: TypeName = thisType.idField?.sqliteTypeName ?? .integer
                 join.create.addForeignKey("parent",
                                           references: Name(value: thisType.name),
                                           column: parentIDColumn,
+                                          type: parentIDType,
                                           canBeNull: false,
                                           onDelete: .cascade)
                 uniqueTuple.append("parent")
@@ -98,7 +102,8 @@ internal struct SQLiteTable {
                     join.create.addColumn("value", type: p.sqliteTypeName, canBeNull: false)
                 } else if let c = m.valueType as? CompositeTypeDescription {
                     let name: Name<Column> = c.isIdentifiable ? "id" : "ROWID"
-                    join.create.addForeignKey("value", references: Name(value: c.name), column: name, canBeNull: false, onDelete: .cascade)
+                    let type = c.idField?.sqliteTypeName ?? .integer
+                    join.create.addForeignKey("value", references: Name(value: c.name), column: name, type: type, canBeNull: false, onDelete: .cascade)
                 }
                 
                 if m.isOrdered == false && m.keyType == nil {
