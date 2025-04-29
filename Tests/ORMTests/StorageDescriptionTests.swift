@@ -6,12 +6,12 @@ struct SchemaTests {
     
     @Test func storedTypeCannotBeAClass() {
         class S: StoredType { }
-        #expect(throws: Schema.Error.storedTypeMustBeValueType(S.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.storedTypeMustBeValueType(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotBeEmpty() {
         struct S: StoredType { }
-        #expect(throws: Schema.Error.storedTypeIsEmpty(S.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.storedTypeIsEmpty(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotHaveOptionalIdentifier() {
@@ -19,7 +19,7 @@ struct SchemaTests {
             var id: String?
         }
         
-        #expect(throws: Schema.Error.identifierCannotBeOptional(S.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.identifierCannotBeOptional(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotHaveComplexIdentifier() {
@@ -27,7 +27,7 @@ struct SchemaTests {
             var id: Array<Int>
         }
         
-        #expect(throws: Schema.Error.identifierMustBePrimitive(S.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.identifierMustBePrimitive(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotHaveComputedIdentifier() {
@@ -36,7 +36,7 @@ struct SchemaTests {
             var name: String
         }
         
-        #expect(throws: Schema.Error.storedTypeMissingIdentifier(S.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.storedTypeMissingIdentifier(S.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCannotHaveNonStorableFields() {
@@ -45,7 +45,7 @@ struct SchemaTests {
             var i: I
         }
         
-        #expect(throws: Schema.Error.unknownFieldType(S.self, "i", \S.i, I.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.unknownFieldType(S.self, "i", \S.i, I.self)) { try Schema(S.self) }
     }
     
     @Test func storedTypeCanHaveRawRepresentableID() throws {
@@ -54,7 +54,7 @@ struct SchemaTests {
             var id: ID
         }
         
-        _ = try #require(try Schema(S.self))
+        _ = try Schema(S.self)
     }
     
     @Test func storedTypeCannotHaveComplexRawRepresentableID() throws {
@@ -63,7 +63,7 @@ struct SchemaTests {
             var id: ID
         }
         
-        #expect(throws: Schema.Error.identifierMustBePrimitive(S.self)) { try Schema(S.self) }
+        #expect(throws: StorageError.identifierMustBePrimitive(S.self)) { try Schema(S.self) }
     }
     
     @Test func schemaIgnoresDuplicateDeclaredTypes() throws {
@@ -71,7 +71,7 @@ struct SchemaTests {
             var name: String
         }
         
-        let s = try #require(try Schema(S.self, S.self))
+        let s = try Schema(S.self, S.self)
         try #require(s.compositeTypes.count == 1)
     }
     
@@ -83,7 +83,7 @@ struct SchemaTests {
             var name: String
         }
         
-        let s = try #require(try Schema(S.self))
+        let s = try Schema(S.self)
         try #require(s.compositeTypes.count == 2)
     }
     
@@ -98,7 +98,7 @@ struct SchemaTests {
             var name: String
         }
         
-        let s = try #require(try Schema(A.self, B.self))
+        let s = try Schema(A.self, B.self)
         try #require(s.compositeTypes.count == 3)
     }
     
@@ -107,7 +107,7 @@ struct SchemaTests {
             var map: Dictionary<String?, Int>
         }
         
-        #expect(throws: Schema.Error.dictionaryKeyCannotBeOptional(A.self, try A.Fields.map)) { try Schema(A.self) }
+        #expect(throws: StorageError.dictionaryKeyCannotBeOptional(A.self, try A.Fields.map)) { try Schema(A.self) }
     }
     
     @Test func storedDictionaryCannotHaveComplexKey() throws {
@@ -118,7 +118,7 @@ struct SchemaTests {
             var value: Int
         }
         
-        #expect(throws: Schema.Error.dictionaryKeyMustBePrimitive(A.self, try A.Fields.map)) { try Schema(A.self) }
+        #expect(throws: StorageError.dictionaryKeyMustBePrimitive(A.self, try A.Fields.map)) { try Schema(A.self) }
     }
     
     @Test func multiValueFieldsCannotBeOptional() throws {
@@ -126,7 +126,7 @@ struct SchemaTests {
             var ints: Array<Int>?
         }
         
-        #expect(throws: Schema.Error.multiValueFieldsCannotBeOptional(A.self, try A.Fields.ints)) { try Schema(A.self) }
+        #expect(throws: StorageError.multiValueFieldsCannotBeOptional(A.self, try A.Fields.ints)) { try Schema(A.self) }
     }
     
     @Test func multiValueFieldsCannotBeNested() throws {
@@ -134,7 +134,7 @@ struct SchemaTests {
             var names: Array<Array<String>>
         }
         
-        #expect(throws: Schema.Error.multiValueFieldsCannotBeNested(A.self, try A.Fields.names)) { try Schema(A.self) }
+        #expect(throws: StorageError.multiValueFieldsCannotBeNested(A.self, try A.Fields.names)) { try Schema(A.self) }
     }
     
     @Test func dictionaryValuesCannotBeNested() throws {
@@ -142,7 +142,7 @@ struct SchemaTests {
             var names: Dictionary<String, Array<String>>
         }
         
-        #expect(throws: Schema.Error.multiValueFieldsCannotBeNested(A.self, try A.Fields.names)) { try Schema(A.self) }
+        #expect(throws: StorageError.multiValueFieldsCannotBeNested(A.self, try A.Fields.names)) { try Schema(A.self) }
     }
     
     @Test func noDoubleOptionals() throws {
@@ -150,6 +150,6 @@ struct SchemaTests {
             var name: String??
         }
         
-        #expect(throws: Schema.Error.optionalFieldCannotNestOptional(A.self, try A.Fields.name)) { try Schema(A.self) }
+        #expect(throws: StorageError.optionalFieldCannotNestOptional(A.self, try A.Fields.name)) { try Schema(A.self) }
     }
 }

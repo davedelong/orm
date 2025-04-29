@@ -10,7 +10,7 @@ import Foundation
 extension StoredType {
     
     internal static var storedFields: Array<StoredField> {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             var fields = Array<StoredField>()
             for (name, keyPath) in Self.fields {
                 fields.append(try StoredField(baseType: Self.self, name: name, keyPath: keyPath))
@@ -31,7 +31,7 @@ public struct StoredField {
     
     internal init(baseType: any StoredType.Type,
          name: String,
-         keyPath: AnyKeyPath) throws(Schema.Error) {
+         keyPath: AnyKeyPath) throws(StorageError) {
         
         let fieldType = keyPath.erasedValueType
         
@@ -47,7 +47,7 @@ public struct StoredField {
             self.description = desc
             
         } else {
-            throw Schema.Error.unknownFieldType(baseType, name, keyPath, fieldType)
+            throw StorageError.unknownFieldType(baseType, name, keyPath, fieldType)
         }
     }
     
@@ -57,7 +57,7 @@ public struct StoredField {
 internal struct Fields<S: StoredType> {
     
     subscript<V>(dynamicMember keyPath: KeyPath<S, V>) -> StoredField {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             guard let (name, keyPath) = S.fields.first(where: { $1 == keyPath }) else {
                 throw .unknownFieldType(S.self, "", keyPath, V.self)
             }

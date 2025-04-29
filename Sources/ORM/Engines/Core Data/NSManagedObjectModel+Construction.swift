@@ -14,7 +14,7 @@ extension NSManagedObjectModel {
     private typealias NSAD = NSAttributeDescription
     private typealias NSRD = NSRelationshipDescription
     
-    convenience init(compositeTypes: Array<CompositeTypeDescription>) throws(Schema.Error) {
+    convenience init(compositeTypes: Array<CompositeTypeDescription>) throws(StorageError) {
         self.init()
         
         for compositeType in compositeTypes {
@@ -37,7 +37,7 @@ extension NSManagedObjectModel {
         return e
     }
     
-    private func buildEntity(from description: CompositeTypeDescription) throws(Schema.Error) {
+    private func buildEntity(from description: CompositeTypeDescription) throws(StorageError) {
         let e = NSEntityDescription()
         e.name = description.name
         e.properties = description.fields.compactMap { NSAD.attribute(from: $0) }
@@ -49,7 +49,7 @@ extension NSManagedObjectModel {
         self.entities.append(e)
     }
     
-    private func buildRelationships(from description: CompositeTypeDescription) throws(Schema.Error) {
+    private func buildRelationships(from description: CompositeTypeDescription) throws(StorageError) {
         
         for field in description.fields {
             if field.description is CompositeTypeDescription {
@@ -120,7 +120,7 @@ extension NSAttributeDescription {
 
 extension NSRelationshipDescription {
     
-    fileprivate static func singleValueRelationship(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(Schema.Error) {
+    fileprivate static func singleValueRelationship(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(StorageError) {
         
         let sourceEntity = model.entity(named: sourceType.name)
         
@@ -168,7 +168,7 @@ extension NSRelationshipDescription {
         destinationEntity.properties.append(destToSrc)
     }
     
-    fileprivate static func multiValueRelationship(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(Schema.Error) {
+    fileprivate static func multiValueRelationship(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(StorageError) {
         
         guard let multi = field.description as? MultiValueTypeDescription else { return }
         
@@ -188,7 +188,7 @@ extension NSRelationshipDescription {
         
     }
     
-    private static func multiValueList(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(Schema.Error) {
+    private static func multiValueList(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(StorageError) {
         
         let multi = field.description as! MultiValueTypeDescription
         
@@ -244,7 +244,7 @@ extension NSRelationshipDescription {
         destinationEntity.properties.append(destToSrc)
     }
     
-    private static func multiValueMap(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(Schema.Error) {
+    private static func multiValueMap(from sourceType: CompositeTypeDescription, field: StoredField, in model: NSManagedObjectModel) throws(StorageError) {
         
         let multi = field.description as! MultiValueTypeDescription
         let key = multi.keyType!

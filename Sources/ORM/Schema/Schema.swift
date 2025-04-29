@@ -25,10 +25,14 @@ public struct Schema {
         storedTypes.map(\.baseType)
     }
     
-    public init<F: StoredType, each S: StoredType>(_ first: F.Type, _ types: repeat (each S).Type) throws(Error) {
+    public init(_ first: any StoredType.Type, _ types: any StoredType.Type...) throws(StorageError) {
+        let all = [first] + types
+        try self.init(types: all)
+    }
+    
+    public init(types: Array<any StoredType.Type>) throws(StorageError) {
         var unprocessedTypeDescriptions = Array<any StoredTypeDescription>()
-        unprocessedTypeDescriptions.append(try first.storedTypeDescription)
-        repeat unprocessedTypeDescriptions.append(try (each types).storedTypeDescription)
+        for type in types { unprocessedTypeDescriptions.append(try type.storedTypeDescription) }
         
         var processedTypes = Set<ObjectIdentifier>()
         var storageDescriptions = Array<any StoredTypeDescription>()

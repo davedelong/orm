@@ -11,14 +11,20 @@ import Testing
 #if canImport(CoreData)
 import CoreData
 
-@Suite("Core Data Engine")
+@Suite(.serialized)
 struct CoreDataEngineTests {
+    
+    func temporaryURL(_ caller: StaticString = #function) -> URL {
+        let name = "\(Self.self)-\(caller.description).db"
+        return URL.temporaryDirectory.appending(component: name)
+    }
+    
     @Test func singlePropertyEntity() async throws {
         struct S: StoredType {
             var name: String
         }
         
-        let e = try CoreDataEngine(S.self)
+        let e = try await CoreDataEngine(S.self, at: temporaryURL())
         let model = await e.model
         let sEntity = try #require(model.entities.first)
         #expect(sEntity.name == "S")
@@ -35,7 +41,7 @@ struct CoreDataEngineTests {
             var id: String
         }
         
-        let e = try CoreDataEngine(S.self)
+        let e = try await CoreDataEngine(S.self, at: temporaryURL())
         let model = await e.model
         let sEntity = try #require(model.entities.first)
         #expect(sEntity.name == "S")
@@ -60,7 +66,7 @@ struct CoreDataEngineTests {
             var message: String
         }
         
-        let e = try CoreDataEngine(A.self, B.self)
+        let e = try await CoreDataEngine(A.self, B.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let aUnique = try #require(a.uniquenessConstraints as? Array<[String]>)
@@ -95,7 +101,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -123,7 +129,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -152,7 +158,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -180,7 +186,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -207,7 +213,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -235,7 +241,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -264,7 +270,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -292,7 +298,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -318,7 +324,7 @@ struct CoreDataEngineTests {
             var name: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])
@@ -344,7 +350,7 @@ struct CoreDataEngineTests {
             var id: String
         }
         
-        let e = try CoreDataEngine(A.self)
+        let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
         let b = try #require(await e.model.entitiesByName["B"])

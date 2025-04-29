@@ -19,7 +19,7 @@ public struct MultiValueTypeDescription: StoredTypeDescription {
 
 extension Array: StoredType where Element: StoredType {
     public static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             return MultiValueTypeDescription(baseType: Self.self,
                                              isOrdered: true,
                                              valueType: try Element.storedTypeDescription)
@@ -29,7 +29,7 @@ extension Array: StoredType where Element: StoredType {
 
 extension Set: StoredType where Element: StoredType {
     public static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             return MultiValueTypeDescription(baseType: Self.self,
                                              isOrdered: false,
                                              valueType: try Element.storedTypeDescription)
@@ -39,7 +39,7 @@ extension Set: StoredType where Element: StoredType {
 
 extension Dictionary: StoredType where Key: StoredType, Value: StoredType {
     public static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             return MultiValueTypeDescription(baseType: Self.self,
                                              isOrdered: false,
                                              keyType: try Key.storedTypeDescription,

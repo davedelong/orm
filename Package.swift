@@ -12,14 +12,18 @@ let package = Package(
         .executable(name: "debug", targets: ["debug"])
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/sql-kit.git", from: "3.31.0")
+        .package(url: "https://github.com/davedelong/SQLiteSyntax.git", branch: "main"),
+        .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.15.3"),
+//        .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.4.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(name: "debug", dependencies: ["ORM"]),
         .target(name: "ORM", dependencies: [
-            .product(name: "SQLKit", package: "sql-kit")
+            .product(name: "SQLiteSyntax", package: "SQLiteSyntax"),
+            .product(name: "SQLite", package: "SQLite.swift"),
+//            .product(name: "GRDB", package: "GRDB.swift")
         ]),
         .testTarget(name: "ORMTests", dependencies: ["ORM"]),
     ]

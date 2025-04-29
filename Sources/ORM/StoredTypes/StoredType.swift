@@ -9,7 +9,7 @@ import Foundation
 
 public protocol StoredType {
     static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error)
+        get throws(StorageError)
     }
 }
 
@@ -20,7 +20,7 @@ extension StoredType {
     }
     
     public static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             try CompositeTypeDescription(Self.self)
         }
     }
@@ -30,7 +30,7 @@ extension StoredType {
 extension StoredType where Self: AnyObject {
     
     public static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error) {
+        get throws(StorageError) {
             try CompositeTypeDescription(Self.self)
         }
     }
@@ -38,6 +38,6 @@ extension StoredType where Self: AnyObject {
 
 extension Optional: StoredType where Wrapped: StoredType {
     public static var storedTypeDescription: any StoredTypeDescription {
-        get throws(Schema.Error) { try OptionalTypeDescription(Self.self) }
+        get throws(StorageError) { try OptionalTypeDescription(Self.self) }
     }
 }

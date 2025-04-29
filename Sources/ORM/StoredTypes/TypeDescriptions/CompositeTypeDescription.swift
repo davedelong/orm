@@ -18,11 +18,11 @@ public struct CompositeTypeDescription: StoredTypeDescription {
         return fields.map(\.description)
     }
     
-    init<S: StoredType & AnyObject>(_ type: S.Type) throws(Schema.Error) {
+    init<S: StoredType & AnyObject>(_ type: S.Type) throws(StorageError) {
         throw .storedTypeMustBeValueType(S.self)
     }
     
-    init<S: StoredType>(_ type: S.Type) throws(Schema.Error) {
+    init<S: StoredType>(_ type: S.Type) throws(StorageError) {
         self.baseType = type
         self.name = "\(S.self)"
         self.fields = try S.storedFields
@@ -34,7 +34,7 @@ public struct CompositeTypeDescription: StoredTypeDescription {
         }
     }
     
-    private func validateIdentifiable() throws(Schema.Error) {
+    private func validateIdentifiable() throws(StorageError) {
         let isIdentifiable = (baseType is any Identifiable.Type)
         if let field = fields.first(where: { $0.name == "id" }) {
             guard isIdentifiable else {
@@ -53,7 +53,7 @@ public struct CompositeTypeDescription: StoredTypeDescription {
 
 extension StoredField {
     
-    func validate(on baseType: any StoredType.Type) throws(Schema.Error) {
+    func validate(on baseType: any StoredType.Type) throws(StorageError) {
         
         if let opt = description as? OptionalTypeDescription {
             if opt.wrappedType is MultiValueTypeDescription {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SQLite
 
 public protocol StoredTypeDescription {
     var baseType: any StoredType.Type { get }
