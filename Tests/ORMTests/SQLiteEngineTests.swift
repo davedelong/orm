@@ -55,4 +55,13 @@ struct SQLiteEngineTests {
         print(url)
     }
     
+    @Test func simpleStructWithArray() async throws {
+        struct S: StoredType {
+            var name: String
+            var emails: Array<String>
+        }
+        
+        let _ = try await SQLiteEngine(S.self, at: temporaryURL())
+    }
+    
 }
