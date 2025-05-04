@@ -104,7 +104,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -132,7 +132,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -161,7 +161,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -189,7 +189,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -216,7 +216,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -244,7 +244,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -273,7 +273,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)
@@ -301,7 +301,7 @@ struct CoreDataEngineTests {
         let e = try await CoreDataEngine(A.self, at: temporaryURL())
         
         let a = try #require(await e.model.entitiesByName["A"])
-        let b = try #require(await e.model.entitiesByName["B"])
+        let _ = try #require(await e.model.entitiesByName["B"])
         
         let aB = try #require(a.relationshipsByName["b"])
         #expect(aB.isOrdered == false)

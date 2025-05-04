@@ -61,6 +61,10 @@ extension StoredField {
     
     func validate(on baseType: any StoredType.Type) throws(StorageError) {
         
+        if name.lowercased() == "rowid" {
+            throw .invalidFieldName(baseType, name, keyPath)
+        }
+        
         if let opt = description as? OptionalTypeDescription {
             if opt.wrappedType is MultiValueTypeDescription {
                 throw .multiValueFieldsCannotBeOptional(baseType, self)

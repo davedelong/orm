@@ -9,9 +9,7 @@ public struct Schema {
     
     public let storedTypes: Array<any StoredTypeDescription>
     
-    public var compositeTypes: Array<CompositeTypeDescription> {
-        storedTypes.compactMap({ $0 as? CompositeTypeDescription })
-    }
+    public let compositeTypes: Array<CompositeTypeDescription>
     
     public var primitiveTypes: Array<PrimitiveTypeDescription> {
         storedTypes.compactMap({ $0 as? PrimitiveTypeDescription })
@@ -21,9 +19,9 @@ public struct Schema {
         storedTypes.compactMap({ $0 as? MultiValueTypeDescription })
     }
     
-    public var baseTypes: Array<any StoredType.Type> {
-        storedTypes.map(\.baseType)
-    }
+    public let baseTypes: Array<any StoredType.Type>
+    
+    private let typeDescriptionLookup: Dictionary<ObjectIdentifier, CompositeTypeDescription>
     
     public init(_ first: any StoredType.Type, _ types: any StoredType.Type...) throws(StorageError) {
         let all = [first] + types
@@ -49,6 +47,17 @@ public struct Schema {
         } while unprocessedTypeDescriptions.isEmpty == false
         
         self.storedTypes = storageDescriptions
+        self.baseTypes = storageDescriptions.map(\.baseType)
+        self.compositeTypes = storageDescriptions.compactMap({ $0 as? CompositeTypeDescription })
+        
+        self.typeDescriptionLookup = Dictionary(uniqueKeysWithValues: compositeTypes.map {
+            (ObjectIdentifier($0.baseType), $0)
+        })
+    }
+    
+    internal func description(for value: any StoredType) -> CompositeTypeDescription? {
+        let type = type(of: value)
+        return typeDescriptionLookup[ObjectIdentifier(type)]
     }
     
 }

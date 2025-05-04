@@ -25,7 +25,9 @@ extension Schema {
                     return l == r
                 case (.identifierMustBePrimitive(let l), .identifierMustBePrimitive(let r)):
                     return l == r
-                
+                    
+                case (.invalidFieldName(let lType, let lName, _), .invalidFieldName(let rType, let rName, _)):
+                    return lType == rType && lName.lowercased() == rName.lowercased()
                 case (.unknownFieldType(let lType, let lName, _, _), .unknownFieldType(let rType, let rName, _, _)):
                     return lType == rType && lName == rName
                     
@@ -60,6 +62,7 @@ extension Schema {
         case identifierCannotBeOptional(any StoredType.Type)
         case identifierMustBePrimitive(any StoredType.Type)
         
+        case invalidFieldName(any StoredType.Type, String, AnyKeyPath)
         case unknownFieldType(any StoredType.Type, String, AnyKeyPath, Any.Type)
         
         case optionalFieldCannotNestOptional(any StoredType.Type, StoredField)

@@ -25,9 +25,32 @@ extension StoredType {
 
 public struct StoredField {
     
+    internal enum Kind {
+        case primitive
+        case reference
+        case multiValue
+        
+        init(_ type: any StoredTypeDescription) {
+            if type is PrimitiveTypeDescription {
+                self = .primitive
+            } else if type is CompositeTypeDescription {
+                self = .reference
+            } else if type is MultiValueTypeDescription {
+                self = .multiValue
+            } else if let o = type as? OptionalTypeDescription {
+                self = Kind(o.wrappedType)
+            } else {
+                fatalError("UNKNOWN TYPE DESCRIPTION \(type)")
+            }
+        }
+    }
+    
     public let name: String
     public let keyPath: AnyKeyPath
     public let description: any StoredTypeDescription
+    
+    internal let kind: Kind
+    internal let isOptional: Bool
     
     internal init(baseType: any StoredType.Type,
          name: String,
@@ -35,16 +58,18 @@ public struct StoredField {
         
         let fieldType = keyPath.erasedValueType
         
+        self.name = name
+        self.keyPath = keyPath
+        self.isOptional = fieldType is OptionalType
+        
         if let storedType = fieldType as? any StoredType.Type {
             let description = try storedType.storedTypeDescription
-            self.name = name
-            self.keyPath = keyPath
             self.description = description
+            self.kind = Kind(description)
             
         } else if let rawType = fieldType as? any RawRepresentable.Type, let desc = try rawType.storedTypeDescription {
-            self.name = name
-            self.keyPath = keyPath
             self.description = desc
+            self.kind = Kind(desc)
             
         } else {
             throw StorageError.unknownFieldType(baseType, name, keyPath, fieldType)

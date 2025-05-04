@@ -47,3 +47,23 @@ extension Dictionary: StoredType where Key: StoredType, Value: StoredType {
         }
     }
 }
+
+internal struct SetTableSchema<P: StoredType, T: StoredType>: StoredType {
+    var parent: P
+    var value: T
+    var processed: Bool
+}
+
+internal struct ArrayTableSchema<P: StoredType, T: StoredType>: StoredType {
+    var parent: P
+    var value: T
+    var order: Int
+    var processed: Bool
+}
+
+internal struct MapTableSchema<P: StoredType, K: StoredType, T: StoredType>: StoredType {
+    var parent: P
+    var key: K
+    var value: T
+    var processed: Bool
+}

@@ -152,4 +152,12 @@ struct SchemaTests {
         
         #expect(throws: StorageError.optionalFieldCannotNestOptional(A.self, try A.Fields.name)) { try Schema(A.self) }
     }
+    
+    @Test func noPropertyNamedRowID() throws {
+        struct A: StoredType {
+            var rowid: Int
+        }
+        
+        #expect(throws: StorageError.invalidFieldName(A.self, "rowid", \A.rowid)) { try Schema(A.self) }
+    }
 }
