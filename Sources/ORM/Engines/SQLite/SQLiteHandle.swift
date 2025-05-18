@@ -46,6 +46,8 @@ internal class SQLiteHandle {
             try check(status)
             return try ptr ?! SQLiteError(rawValue: SQLITE_INTERNAL)
         }
+        
+        try execute("PRAGMA journal_mode=WAL")
     }
     
     deinit {
@@ -64,7 +66,9 @@ internal class SQLiteHandle {
     @discardableResult
     func execute(_ sql: String) throws -> SQLiteStatement.Step {
         let s = try prepare(sql)
-        return try run(s)
+        let r = try run(s)
+        try s.finish()
+        return r
     }
     
     func prepare(_ sql: String) throws -> SQLiteStatement {
@@ -206,6 +210,11 @@ internal class SQLiteStatement {
         } else {
             return .ok(results)
         }
+    }
+    
+    func finish() throws {
+        guard let handle else { return }
+        try check(sqlite3_reset(handle))
     }
 }
 

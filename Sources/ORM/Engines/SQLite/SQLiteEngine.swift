@@ -15,6 +15,7 @@ import SQLiteSyntax
  NOTES:
  - sqlite3_deserialize + sqlite3_serialize to convert an in-memory database to/from a writable Data
  - sqlite3_snapshot_open for queries? to make sure that retrieving related values is consistent?
+ - sqlite3_update_hook for observation deltas
  
  */
 
@@ -55,6 +56,7 @@ public actor SQLiteEngine: StorageEngine {
                 
                 let result = try h.run(statement)
                 print(result)
+                try statement.finish()
             }
         } catch {
             print("ERROR: \(error)")
