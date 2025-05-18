@@ -20,6 +20,7 @@ internal protocol DictionaryType {
 
 internal protocol OptionalType {
     static var wrappedType: Any.Type { get }
+    var isNull: Bool { get }
 }
 
 extension Array: ArrayType {
@@ -37,6 +38,10 @@ extension Dictionary: DictionaryType {
 
 extension Optional: OptionalType {
     static var wrappedType: any Any.Type { Wrapped.self }
+    var isNull: Bool {
+        if case .none = self { return true }
+        return false
+    }
 }
 
 extension RawRepresentable {

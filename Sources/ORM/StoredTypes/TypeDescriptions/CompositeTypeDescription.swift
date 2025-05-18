@@ -11,6 +11,8 @@ public struct CompositeTypeDescription: StoredTypeDescription {
     public let name: String
     public let baseType: any StoredType.Type
     public let fields: Array<StoredField>
+    internal let fieldsByKeyPath: Dictionary<AnyKeyPath, StoredField>
+    internal let fieldsByName: Dictionary<String, StoredField>
     
     public var isIdentifiable: Bool { baseType is any Identifiable.Type }
     
@@ -32,6 +34,8 @@ public struct CompositeTypeDescription: StoredTypeDescription {
         self.baseType = type
         self.name = "\(S.self)"
         self.fields = try S.storedFields
+        self.fieldsByKeyPath = Dictionary(uniqueKeysWithValues: fields.map { ($0.keyPath, $0) })
+        self.fieldsByName = Dictionary(uniqueKeysWithValues: fields.map { ($0.name, $0) })
         
         if fields.isEmpty { throw .storedTypeIsEmpty(S.self) }
         try validateIdentifiable()

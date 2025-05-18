@@ -9,14 +9,14 @@ import Foundation
 
 public protocol StorageEngine: Actor {
     
-    init(schema: Schema, at url: URL) async throws(StorageError)
+    init(schema: Schema, at url: URL) async throws
     
-    func save(_ value: any StoredType) throws(StorageError)
+    func save(_ value: any StoredType) throws
 }
 
 extension StorageEngine {
     
-    public init(_ first: any StoredType.Type, _ others: any StoredType.Type..., at url: URL) async throws(StorageError) {
+    public init(_ first: any StoredType.Type, _ others: any StoredType.Type..., at url: URL) async throws {
         var all: Array<any StoredType.Type> = [first]
         all.append(contentsOf: others)
         let s = try Schema(types: all)

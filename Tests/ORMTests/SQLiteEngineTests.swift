@@ -76,7 +76,17 @@ struct SQLiteEngineTests {
             var a: A?
         }
         
-        let _ = try await SQLiteEngine(A.self, B.self, at: temporaryURL())
+        let _ = try await SQLiteEngine(B.self, at: temporaryURL())
+    }
+    
+    @Test func saveSimpleValue() async throws {
+        struct A: Identifiable, StoredType {
+            let id: String
+            let name: String
+        }
+        
+        let e = try await SQLiteEngine(A.self, at: temporaryURL())
+        try await e.save(A(id: "test", name: "Arthur"))
     }
     
 }

@@ -41,7 +41,7 @@ internal struct SQLiteTable {
         self.name = name
         self.create = Table.Create(name: Name(value: name))
         self.insertStatement = InsertStatement(
-            action: .replace,
+            action: .insert(.replace),
             tableName: Name(value: name),
             values: .values([], nil),
             returning: nil

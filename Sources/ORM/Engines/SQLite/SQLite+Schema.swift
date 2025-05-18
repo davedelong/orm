@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SQLite
 import SQLiteSyntax
 
 internal struct SQLiteSchema {
@@ -23,11 +22,11 @@ internal struct SQLiteSchema {
         }
     }
     
-    func build(into connection: SQLite.Connection) throws {
-        try connection.transaction {
+    func build(into connection: SQLiteHandle) throws {
+        try connection.transaction { h in
             for table in tables {
                 let sql = try table.create.sql()
-                try connection.execute(sql)
+                try h.execute(sql)
             }
         }
     }
